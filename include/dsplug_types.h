@@ -1,3 +1,7 @@
+/**
+ * \file dsplug_types.h
+ * \author Juan Linietsky
+ */
 
 #ifndef DSPLUG_TYPES_H
 #define DSPLUG_TYPES_H
@@ -11,7 +15,7 @@
 
 /* Boolean Values */
 
-typedef int DSPLUG_Boolean;
+typedef int DSPlug_Boolean;
 
 /* Boolean Constants */
 
@@ -27,201 +31,219 @@ typedef int DSPLUG_Boolean;
 
 typedef enum {
 
-	DSPLUG_PLUGIN_TYPE_GENERIC			= 1 ,
-	/*
-	 Any number and any kind of data input or output ports
-	 will be provided. These kind of plugins will most likely be
-	 used from custom applications or modular hosts.
+	/**
+	* Any number and any kind of data input or output ports
+	* will be provided. These kind of plugins will most likely be
+	* used from custom applications or modular hosts.
+	*/
+	DSPLUG_USAGE_HINT_GENERIC			= 1 ,
+	
+	/**
+	* To comply with this, the plugin will have ONE input
+	* AUDIO port (of any given number of channels).
+	* The plugin will be meant for applications that need
+	* to analyze the audio at some point, and provide
+	* feedback through the control ports or the UI.
 	*/
 	
-	DSPLUG_PLUGIN_TYPE_AUDIO_ANALYZER		= 2 ,
-	/*
-	 To comply with this, the plugin will have ONE input
-	 AUDIO port (of any given number of channels).
-	 The plugin will be meant for applications that need
-	 to analyze the audio at some point, and provide
-	 feedback through the control ports or the UI.
+	DSPLUG_USAGE_HINT_AUDIO_ANALYZER		= 2 ,
+
+	/**
+	* Plugins that comply with this will provide
+	* ONE bidirectional audio port.
+	* The plugin will take an input signal, apply a
+	* process, then return the modified signal.
+	*/
+	DSPLUG_USAGE_HINT_SIMPLE_AUDIO_PROCESSOR	= 3 ,
+	
+	/**
+	* Modulator Plugins will provide a bidirectional
+	* AUDIO port, plus any number of extra AUDIO inputs.
+	* All the SAME number of channels.
+	* Most common examples of this
+	* are a vocoder, a ring modulator, FM
+	* modulator, sidechained compressor, etc.
+	* The FIRST input audio port will contain the
+	* signal to be modulated, if that applies. (carrier in FM, for example)
+	*/
+	DSPLUG_USAGE_HINT_AUDIO_MODULATOR		= 4 ,
+
+	/**
+	* One AUDIO input, ANY amount of outputs.
+	* All the SAME amount of channels.
+	* Mostly used for signal decomposers.
+	* Examples of this are multiband/filterbank splitter,
 	*/
 
-	DSPLUG_PLUGIN_TYPE_SIMPLE_AUDIO_PROCESSOR	= 3 ,
-	/*
-	 Plugins that comply with this will provide
-	 ONE input audio port and ONE output audio port,
-	 both the SAME number of channels each.
-	 The plugin will take an input signal, apply a
-	 process, then return the modified signal.
+	DSPLUG_USAGE_HINT_AUDIO_SPLITTER		= 5 ,
+	/**
+	* To comply with this, the plugin will only have output ports.
+	* This is common for white noise sources, oscillators, or
+	* plugins that take sound from somewhere else in the system
+	* (for example, speech/sing synthesis from a text file, or
+	* an audio capture api).
 	*/
 	
-	DSPLUG_PLUGIN_TYPE_AUDIO_MODULATOR		= 4 ,
-	/*
-	 Modulator Plugins will need to provide any
-	 number of Input AUDIO ports and only ONE
-	 Output AUDIO Port. All the SAME number of
-	 channels.  Most common examples of this
-	 are a vocoder, a ring modulator, FM
-	 modulator, sidechained compressor, etc.
-	 The FIRST input audio port will contain the
-	 signal to be modulated, if that applies. (carrier in FM, for example)
-	*/
+	DSPLUG_USAGE_HINT_AUDIO_GENERATOR		= 6 ,
 
-
-	DSPLUG_PLUGIN_TYPE_AUDIO_SPLITTER		= 5 ,
-	/*
-	 One AUDIO input, ANY amount of outputs.
-	 All the SAME amount of channels.
-	 Mostly used for signal decomposers.
-	 Examples of this are multiband/filterbank splitter,
+	/**
+	* These kind of plugins will have only ONE audio input
+	* and will produce events using ONE or MORE music event ports.
+	* This is mostly used in pitch or beat recognition.
 	*/
-	
-	DSPLUG_PLUGIN_TYPE_AUDIO_GENERATOR		= 6 ,
-	/*
-	 To comply with this, the plugin will only have output ports.
-	 This is common for white noise sources, oscillators, or
-	 plugins that take sound from somewhere else in the system
-	 (for example, speech/sing synthesis from a text file).
-	*/
-
-	DSPLUG_PLUGIN_TYPE_MUSIC_EVENT_EXTRACTOR	= 7 ,
-	/*
-	 These kind of plugins will have only ONE audio input
-	 and will produce events using ONE or MORE music event ports.
-	 This is mostly used in pitch or beat recognition.
-	*/
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_EXTRACTOR	= 7 ,
 										
-	DSPLUG_PLUGIN_TYPE_MUSIC_EVENT_FILTER		= 8 ,
-	/* 
-	 This kind of plugins will have ONE music event
-	 input and ONE music event output, both in OMNI mode,
-	 without audio ports. Most common uses would be event filters,
-	 arpeggiator, etc
+	/** 
+	* This kind of plugins will have ONE bidirectional music event
+	* port. in OMNI mode,
+	* without audio ports. Most common uses would be event filters,
+	* arpeggiator, etc
 	*/
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_FILTER		= 8 ,
 	
-	DSPLUG_PLUGIN_TYPE_MUSIC_EVENT_MATRIX		= 9,
-	/*
-	 Plugins of this kind can have multiple event inputs
-	 and outputs, and they are meant for routing matrices,
-	 automatic arrangement generation, etc. Parts are
-	 supported for this type.
+	/**
+	* Plugins of this kind can have multiple event inputs
+	* and outputs, and they are meant for routing matrices,
+	* automatic arrangement generation, etc. Parts are
+	* supported for this type.
 	*/
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_MATRIX		= 9,
 	
-	DSPLUG_PLUGIN_TYPE_MUSIC_EVENT_ANALYZER		= 8,
-	/*
-	 Just like an audio analyzer, but with events.
-	 This is useful for analysis tools.
+	/**
+	* Just like an audio analyzer, but with events.
+	* This is useful for analysis tools, but could be
+	* used also to send the event to external ports.
 	*/
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_ANALYZER		= 8,
 
-	DSPLUG_PLUGIN_TYPE_MUSIC_EVENT_GENERATOR	= 9,
-	/*
-	 Plugins that comply with this will have one or
-	 more music event ouputs only, which can be used
-	 to generate beats
+	/**
+	* Plugins that comply with this will have one or
+	* more music event ouputs only, which can be used
+	* to generate beats
 	*/
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_GENERATOR	= 9,
 
-	DSPLUG_PLUGIN_TYPE_MUSIC_EVENT_MODULATOR	= 10,
-	/*
-	 This plugin is like an audio processor plugin,
-	 except it also provides an input music event
-	 port in OMNI mode. The most common use for
-	 this device is to modulate the audio input
-	 using musical events, as a type of auto-tuner,
-	 or applying parameters (like pan/volume/vibrato)
-	 to the audio.
+	/**
+	* This plugin is like an audio processor plugin,
+	* except it also provides an input music event
+	* port in OMNI mode. The most common use for
+	* this device is to modulate the audio input
+	* using musical events, as a type of auto-tuner,
+	* or applying parameters (like pan/volume/vibrato)
+	* to the audio.
 	*/
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_MODULATOR	= 10,
 
-	DSPLUG_PLUGIN_TYPE_SYNTHESIZER			= 11,
-	/*
-	 Finally This plugin takes ONE music event port (in OMNI mode) and
-	 outputs to ONE audio port (two if stereo, etc). The use for
-	 this is software musical synthesis. Again, music event port provided
-	 will work in OMNI mode, meaning it will discard the midi channel info.
-	 This plugin could also be used for creating virtual singers, since
-	 DSPLUG supports string-based control ports, you can input strings together
-	 with the midi events.
+	/**
+	* Finally This plugin takes ONE music event port (in OMNI mode) and
+	* outputs to ONE audio port . The use for
+	* this is software musical synthesis. Again, music event port provided
+	* will work in OMNI mode, meaning it will discard the midi channel info.
+	* This plugin could also be used for creating virtual singers, since
+	* DSPLUG supports string-based control ports, you can input strings together
+	* with the midi events.
 	*/
+	DSPLUG_USAGE_HINT_SYNTHESIZER			= 11,
 										
-	DSPLUG_PLUGIN_TYPE_MULTIPART_SYNTHESIZER 	= 12,
-	/*
-	 The same as above, but with any number of input
-	 music event ports and any number of audio outputs.
-	 This exists because many of these plugins will need to hold
-	 shared data, such as samples, oscillators, etc that the preset use,
-	 which can be very memory intensive, or simply want to
-	 emulate a full music device. Since such type of plugin has parts
-	 (ports per each music channel) the part for a midi channel for a
-	 given port is: number of midi port * 16 + midi channel.
+	/**
+	* The same as above, but with any number of input
+	* music event ports and any number of audio outputs.
+	* This exists because many of these plugins will need to hold
+	* shared data, such as samples, oscillators, etc that the preset use,
+	* which can be very memory intensive, or simply want to
+	* emulate a full music device. Since such type of plugin has parts
+	* (ports per each music channel) the part for a midi channel for a
+	* given port is: number of midi port * 16 + midi channel.
 	*/
+	DSPLUG_USAGE_HINT_MULTIPART_SYNTHESIZER 	= 12,
  
-} DSPLUG_Plugin_Type;
-
+} DSPlug_PluginUsageHint;
 
 /* //////////////////////////////////////////////////////// */
 
+
+/* Plug Type */
+
+typedef enum {
+
+	DSPLUG_PLUG_INPUT 	= 0, /**< Port Provides Input */
+	DSPLUG_PLUG_OUTPUT 	= 1, /**< Port Provides Output */
+	DSPLUG_PLUG_BIDI 	= 2, /**< Port Provides Both Input And Output (bidirectional)*/
+
+} DSPlug_PlugType;
+
+/* //////////////////////////////////////////////////////// */
+
+/* Port Tyoe */
+
+typedef enum {
+
+	DSPLUG_PORT_AUDIO 	= 0, /**< Audio Port */
+	DSPLUG_PORT_EVENT 	= 1, /**< Control Port */
+	DSPLUG_PORT_CONTROL 	= 2, /**< Event Port*/
+
+} DSPlug_PortType;
+
+
+/* //////////////////////////////////////////////////////// */
 
 /* Event Port Types */
 
 
 typedef enum {
 
-	DSPLUG_EVENT_PORT_TYPE_MASTERTRACK	= 1,
-	/*
-	 This port receives sequencer mastertrack events such as
-	 timebase/tempo/key/etc.
-	 Even if the plugin supports this port, the host is not
-	 forced to provide it (though it may be a good idea to
-	 do so, if possible). The plugin may not work as well
-	 without this. (or may not work at all).
-	 Anyway, you can provide this no matter what the plugin type is.
+	/**
+	* This port receives sequencer mastertrack events such as
+	* timebase/tempo/key/etc.
+	* Even if the plugin supports this port, the host is not
+	* forced to provide it (though it may be a good idea to
+	* do so, if possible). The plugin may not work as well
+	* without this. (or may not work at all).
+	* Anyway, you can provide this no matter what the plugin type is.
 	*/
+	DSPLUG_EVENT_TYPE_MASTERTRACK	= 1,
 
-	DSPLUG_EVENT_PORT_TYPE_MIDI		= 2,
-	/*
-	 MIDI  Ports are regular EVENT ports that can send
-	 or receive musical data. So far only MIDI ports are
-	 implemented.
+	/**
+	* MIDI  Ports are regular EVENT ports that can send
+	* or receive musical data. So far only MIDI ports are
+	* implemented.
 	*/
+	DSPLUG_EVENT_TYPE_MIDI		= 2,
 	
 	
-} DSPLUG_Event_Port_Type;
+} DSPlug_EventType;
+
+
+
 
 
 /* //////////////////////////////////////////////////////// */
 
 
 /* Control Port Types */
+	
+typedef enum {
 
+
+	DSPLUG_CONTROL_PORT_TYPE_NUMERICAL	= 0, /**< Port handles floating point values from 0.0f to 1.0f */
+	DSPLUG_CONTROL_PORT_TYPE_STRING		= 1, /**< Port handles C-String values */
+	DSPLUG_CONTROL_PORT_TYPE_DATA		= 2, /**< Port handles Binary Data */
+
+} DSPlug_ControlPortType;
+
+/* //////////////////////////////////////////////////////// */
+
+
+/* Numerical Control Port Hints */
 
 typedef enum {
 
-/* Simple Port Types */
-	DSPLUG_CONTROL_PORT_TYPE_FLOAT		=1,
-	/* Normal port, sets/reads values from 0 to 1 */
-	DSPLUG_CONTROL_PORT_TYPE_INTEGER	=2,
-	/* Same as float port, except it has stepping */
-	 DSPLUG_CONTROL_PORT_TYPE_ENUM		=3,
-	/* Same as integer, but you can retrieve names for each value */
-	DSPLUG_CONTROL_PORT_TYPE_BOOL		=4,
-	/* Only accepts >=0.5 as true, otherwise false */
-	DSPLUG_CONTROL_PORT_TYPE_TRIGGER	=5,
-	/*
-	 Write any value, and it will trigger a process
-	 Whathever is read can be ignored
-	 This port exists mainly to ease graphical representation
-	*/
+	DSPLUG_CONTROL_PORT_TYPE_FLOAT		= 0, /**< Normal port, sets/reads values from 0.0f to 1.1f */
+	DSPLUG_CONTROL_PORT_TYPE_INTEGER	= 1, /**< Same as float port, except it has stepping */
+	DSPLUG_CONTROL_PORT_TYPE_ENUM		= 2, /**< Same as integer, but you can retrieve names for each value */
+	DSPLUG_CONTROL_PORT_TYPE_BOOL		= 3, /**< Only accepts >=0.5 as true, otherwise false */
 
-/* Complex Port Types */
-
-	DSPLUG_CONTROL_PORT_TYPE_CSTRING	=100,
-	/*
-	 Read/Write C-Strings
-	 Reading from automation port is imited to a fixed size for realtime issues
-	*/
-	DSPLUG_PORT_TYPE_DATA		=200,
-	/*
-	 Read/Write anything, but cant be user for automation
-	*/
-
-} DSPLUG_Control_Port_Type;
-
+} DSPlug_ControlPortNumericalHint;
 
 /* //////////////////////////////////////////////////////// */
 
@@ -229,54 +251,38 @@ typedef enum {
 
 typedef enum {
 
-	DSPLUG_PLUGIN_FEATURE_INPLACE 			= 1 ,
-	/*
-	 Supports inplace replacement when plugin is
-	 of type DSPLUG_PLUGIN_TYPE_SIMPLE_AUDIO_PROCESSOR.
+	
+	/**
+	* if the plugin algorithm is of type:
+	* DSPLUG_USAGE_HINT_SIMPLE_AUDIO_PROCESSOR
+	* and complies with the linearity requirement
+	* that c*out=c*in then it can define this
+	* feature.
 	*/
 	
-	DSPLUG_PLUGIN_FEATURE_HARD_REALTIME		= 2 ,
-	/*
-	 The plugin will not do any system/library call
-	 that can result in the blocking of the process
-	 from where it is being run.
-	*/
-	
-	DSPLUG_PLUGIN_FEATURE_LINEARITY_PROCESSING 	= 3 ,
-	/*
-	 if the plugin algorithm is of type:
-	 DSPLUG_PLUGIN_TYPE_SIMPLE_AUDIO_PROCESSOR
-	 and complies with the linearity requirement
-	 that c*out=c*in then it can define this
-	 feature.
-	*/
+	DSPLUG_PLUGIN_FEATURE_LINEARITY_PROCESSING 	= 0 ,
 
-	DSPLUG_PLUGIN_FEATURE_HAS_GUI			= 4 ,
-	/*
-	 Plugin has built-in graphical user interface editor
-	*/
-
-	DSPLUG_PLUGIN_FEATURE_VARIABLE_AUDIO_CHANNELS	= 5 ,
-	/*
-	 Plugin can be instanced with any given number of
-	 channels per port. Only valid for some plugin types.
-	*/
+	/**
+	* Plugin has built-in graphical user interface editor
+	*/	
+	DSPLUG_PLUGIN_FEATURE_HAS_GUI			= 1 ,
 	
-	DSPLUG_PLUGIN_FEATURE_LOCKING			= 6 ,
-	/*
-	 Plugin features locking. It is not of much use
-	 to the host except for, maybe optimization purposes.
-	 Locking is handled internally by the plugin.
-	 For more info see plugin-api.
-	*/
+	/**
+	* Plugin features locking. It is not of much use
+	* to the host except for, maybe optimization purposes.
+	* Locking is handled internally by the plugin.
+	* For more info see plugin-api.
+	*/	
+	DSPLUG_PLUGIN_FEATURE_LOCKING			= 2 ,
 	
-	DSPLUG_PLUGIN_FEATURE_LIVE_CONTROLS		= 7 ,
-	/*
-	 Plugin Supports Live Controls mode, see more info on this
-	 on host.h or plugin.h
-	*/
+	/**
+	 * If the plugin needs to be run in realtime, because
+	 * of any reason (most probably interacting with something
+	 * external to the host) it needs to define this flag.
+	 */
+	DSPLUG_PLUGIN_FEATURE_ONLINE_PROCESSING_ONLY	= 3 ,
 
-} DSPLUG_Plugin_Features;
+} DSPlug_PluginFeature;
 
 
 /* //////////////////////////////////////////////////////// */
@@ -287,17 +293,12 @@ typedef enum {
 
 
 typedef enum {
-	DSPLUG_PLUGIN_CONSTANT_MAX_SAMPLING_RATE	= 1,
-	/* Maximum sample rate that the plugin can work at, default is 0 (any) */
-	DSPLUG_PLUGIN_CONSTANT_MIN_SAMPLING_RATE	= 2,
-	/* Minimum sample rate that the plugin can work at default is 1 */
+	DSPLUG_PLUGIN_CONSTANT_MAX_SAMPLING_RATE	= 1, /**< Maximum sample rate that the plugin can work at, default is 0 (any) */
+	DSPLUG_PLUGIN_CONSTANT_MIN_SAMPLING_RATE	= 2, /**< Minimum sample rate that the plugin can work at default is 1 */
 	
-	DSPLUG_PLUGIN_CONSTANT_DEFAULT_CHANNELS		= 3,
-	/*
-	 Default amount of channels the plugin works with, when 
-	 features DSPLUG_PLUGIN_FEATURE_VARIABLE_AUDIO_CHANNELS
+	DSPLUG_PLUGIN_CONSTANT_DEFAULT_CHANNELS		= 3, /**<  Default amount of channels the plugin works with, when  features DSPLUG_PLUGIN_FEATURE_VARIABLE_AUDIO_CHANNELS */
 	*/
-} DSPLUG_Plugin_Constant;
+} DSPlug_PluginConstant;
 	
 
 /* //////////////////////////////////////////////////////// */
@@ -309,22 +310,55 @@ typedef enum {
 /* Sorry, but you can't access the internals yourself, they are compiled-in */
 
 
+/**
+ * Instance to the plugin library opened.
+ */
 typedef struct {
-	void * _private;
-} DSPLUG_HOST_Plugin_Handle;
+	void * _private; /**< No access to the internals are provided */
+} DSPlug_PluginLibrary;
 
+/**
+ * This object stores the capabilities of a given plugin.
+ */
 typedef struct {
-	void * _private;
-} DSPLUG_HOST_Plugin_Caps;
+	void * _private; /**< No access to the internals are provided */
+} DSPlug_PluginCaps;
 
+/**
+ * Instanced plugin. This object is using for the actual data processing.
+ */
 typedef struct {
-	void * _private;
-	void * _plugin_user_private;
-} DSPLUG_Plugin;
+	void * _private; /**< No access to the internals are provided */
+	void * _plugin_user_private;  /**< No access to the internals are provided */
+} DSPlug_PluginInstance;
 
+/**
+ * This object stores the capabilities of an audio port.
+ */
 typedef struct {
-	void * _private;
-} DSPLUG_Event_Queue;
+	void * _private; /**< No access to the internals are provided */
+} DSPlug_AudioPortCaps;
+
+/**
+ * This object stores the capabilities of an event port.
+ */
+typedef struct {
+	void * _private; /**< No access to the internals are provided */
+} DSPlug_EventPortCaps;
+
+/**
+ * This object stores the capabilities of a control port.
+ */
+typedef struct {
+	void * _private; /**< No access to the internals are provided */
+} DSPlug_ControlPortCaps;
+
+/**
+ * Event Queue. Holds a queue of events of a certain type.
+ */
+typedef struct {
+	void * _private; /**< No access to the internals are provided */
+} DSPlug_EventQueue;
 
 
 #endif /* dsplug_types.h */

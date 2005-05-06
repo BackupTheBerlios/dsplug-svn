@@ -182,7 +182,7 @@ DSPlug_PluginUsageHint DSPlug_PluginCaps_get_plugin_usage_hint( DSPlug_PluginCap
  *	\return true if the feature is supported, false otherwise
  */
 
-DSPlug_Boolean DSPlug_PluginCaps_has_feature( DSPlug_PluginCaps * , DSPlug_PluginInstance_Features f);
+DSPlug_Boolean DSPlug_PluginCaps_has_feature( DSPlug_PluginCaps * , DSPlug_PluginFeature f);
 
 /**
  *	Plugin Constants:
