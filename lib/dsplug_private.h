@@ -1,9 +1,9 @@
 
-#ifndef DSPLUG_PRIVATE_H
-#define DSPLUG_PRIVATE_H
+#ifndef DSPlug_PRIVATE_H
+#define DSPlug_PRIVATE_H
 
 
-#include "dsplug/dsplug_types.h"
+#include "dsplug_types.h"
 #include "dsplug_port_info_private.h"
 /* ////////////////////////////////////////////////////////// */
 
@@ -12,10 +12,10 @@
 typedef struct {
 
 
+	int plugin_count;
 
 
-
-} DSPLUG_Plugin_Handle_Private;
+} DSPlug_PluginLibraryPrivate;
 
 /* ////////////////////////////////////////////////////////// */
 
@@ -41,20 +41,20 @@ typedef struct {
 
 	/* Plugin Type */
 	
-	DSPLUG_Plugin_Type type;
+	DSPlug_PluginUsageHint type;
 
 	/* Ports */
 
 		/* Array of pointers to AUDIO PORT Info */
-	DSPLUG_Audio_Port_Info_Private **audio_ports_info;
+	DSPlug_AudioPortCapsPrivate **audio_ports_info;
 	int audio_port_count;
 
 		/* Array of pointers to EVENT PORT Info */
-	DSPLUG_Event_Port_Info_Private **event_port_info;
+	DSPlug_EventPortCapsPrivate **event_port_info;
 	int event_port_count;
 
 		/* Array of pointers to CONTROL PORT Info */
-	DSPLUG_Control_Port_Info_Private **control_port_info;
+	DSPlug_ControlPortCapsPrivate **control_port_info;
 	int control_port_count;
 
 
@@ -69,7 +69,7 @@ typedef struct {
 	
 	
 	
-} DSPLUG_Plugin_Caps_Private;
+} DSPlug_PluginCapsPrivate;
 
 
 /* ////////////////////////////////////////////////////////// */
@@ -82,7 +82,7 @@ typedef struct {
 
 
 
-} DSPLUG_Plugin_Instance_Private;
+} DSPlug_PluginPrivate;
 
 
 #endif /* dsplug private */

@@ -67,14 +67,18 @@ void DSPlug_PluginLibrary_destroy_plugin_caps( DSPlug_PluginLibrary * , DSPlug_P
 
 /**
 	This will instance a plugin from the plugin library. The plugin is
-	what it does the actual processing.
+	what it does the actual processing. We can hint the plugin that the
+	host is or not going to be using the graphical interface. If the plugin
+	cant work at all without the user interface, then will let API
+	know and NULL will be returned here. 
 	\param i plugin index
 	\param r sampling rate at which the plugin will work at
-	\return a plugin instance
+	\param ui instance the plugin UI hint, if true is sent, the plugin can instnce the UI too. Plugins without UI can ignore this.
+	\return a plugin instance, NULL on error.
 	
 
 */
-DSPlug_PluginInstance * DSPlug_PluginLibrary_get_plugin_instance( DSPlug_PluginLibrary * , int i , int r);
+DSPlug_PluginInstance * DSPlug_PluginLibrary_get_plugin_instance( DSPlug_PluginLibrary * , int i , int r, DSPlug_Boolean ui);
 
 /**
  *	Uninitialize a plugin. Call this when you dont need it anymore
@@ -112,7 +116,7 @@ void DSPlug_PluginCaps_get_author( DSPlug_PluginCaps *, char * s );
 
 /** 
  *	Get the plugin copyright string.
- *	For example: "© 2006 John F. Maniac"
+ *	For example: "© 2016 John F. Maniac"
  *	\param s pointer to a char buffer of size: DSPLUG_STRING_MAX_LEN
  *
 */
@@ -613,6 +617,23 @@ char * DSPlug_PluginInstance_get_control_string_port_no_realtime( DSPlug_PluginI
  *	\param l pointer to a variable that will be set with the length of the data
  */	
 void DSPlug_PluginInstance_get_control_port_data( DSPlug_PluginInstance * , int i , void ** d, int * l );
+
+
+/**
+ *	Set a callback to be called when an output/bidi control port has changed inside the plugin.
+ *	If the output control port is realtime enabled, then this method may have been
+ *      called from the RT-Thread, so apply the usual cautions to it for RT-Thread Programming.
+ *      may use this for saving their configuration in binary
+ *	format.
+ *	This is ignored on input ports.
+ *	WARNING THIS FUNCTION CANT BE CALLED ON A REALTIME THREAD!
+ *
+ *	\param i control port index
+ *	\param c callback function to be called
+ *	\param u userdata, this pointer will be returned as parameter in the callback
+ */
+void DSPlug_PluginInstance_set_control_port_changed_callback( DSPlug_PluginInstance * , int i , void (*c)(int, void *) , void * u);
+
 
 
 /****************************/

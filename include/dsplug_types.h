@@ -20,7 +20,7 @@ typedef int DSPlug_Boolean;
 /* Boolean Constants */
 
 #define DSPLUG_TRUE 1
-#define DSPLUG_FALSE 1
+#define DSPLUG_FALSE 0
 
 
 /* //////////////////////////////////////////////////////// */
@@ -76,6 +76,7 @@ typedef enum {
 	*/
 
 	DSPLUG_USAGE_HINT_AUDIO_SPLITTER		= 5 ,
+	
 	/**
 	* To comply with this, the plugin will only have output ports.
 	* This is common for white noise sources, oscillators, or
@@ -83,15 +84,23 @@ typedef enum {
 	* (for example, speech/sing synthesis from a text file, or
 	* an audio capture api).
 	*/
-	
 	DSPLUG_USAGE_HINT_AUDIO_GENERATOR		= 6 ,
 
 	/**
-	* These kind of plugins will have only ONE audio input
-	* and will produce events using ONE or MORE music event ports.
-	* This is mostly used in pitch or beat recognition.
+	* To comply with this, the plugin will only have output ports.
+	* This is common for white noise sources, oscillators, or
+	* plugins that take sound from somewhere else in the system
+	* (for example, speech/sing synthesis from a text file, or
+	* an audio capture api).
 	*/
-	DSPLUG_USAGE_HINT_MUSIC_EVENT_EXTRACTOR	= 7 ,
+	DSPLUG_USAGE_HINT_AUDIO_CHANNEL_REMAPPER	= 7 ,
+	
+	/**
+	* This is for plugins that takes ONE input port of N channels
+	* and ONE output port of M channels.
+	* (for example stero->mono, mono with panpot to stereo, 5.1 encoder, etc)
+      	*/
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_EXTRACTOR		= 8 ,
 										
 	/** 
 	* This kind of plugins will have ONE bidirectional music event
@@ -99,7 +108,7 @@ typedef enum {
 	* without audio ports. Most common uses would be event filters,
 	* arpeggiator, etc
 	*/
-	DSPLUG_USAGE_HINT_MUSIC_EVENT_FILTER		= 8 ,
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_FILTER		= 9 ,
 	
 	/**
 	* Plugins of this kind can have multiple event inputs
@@ -107,21 +116,21 @@ typedef enum {
 	* automatic arrangement generation, etc. Parts are
 	* supported for this type.
 	*/
-	DSPLUG_USAGE_HINT_MUSIC_EVENT_MATRIX		= 9,
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_MATRIX		= 10,
 	
 	/**
 	* Just like an audio analyzer, but with events.
 	* This is useful for analysis tools, but could be
 	* used also to send the event to external ports.
 	*/
-	DSPLUG_USAGE_HINT_MUSIC_EVENT_ANALYZER		= 8,
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_ANALYZER		= 11,
 
 	/**
 	* Plugins that comply with this will have one or
 	* more music event ouputs only, which can be used
 	* to generate beats
 	*/
-	DSPLUG_USAGE_HINT_MUSIC_EVENT_GENERATOR	= 9,
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_GENERATOR		= 12,
 
 	/**
 	* This plugin is like an audio processor plugin,
@@ -132,7 +141,7 @@ typedef enum {
 	* or applying parameters (like pan/volume/vibrato)
 	* to the audio.
 	*/
-	DSPLUG_USAGE_HINT_MUSIC_EVENT_MODULATOR	= 10,
+	DSPLUG_USAGE_HINT_MUSIC_EVENT_MODULATOR		= 13,
 
 	/**
 	* Finally This plugin takes ONE music event port (in OMNI mode) and
@@ -143,7 +152,7 @@ typedef enum {
 	* DSPLUG supports string-based control ports, you can input strings together
 	* with the midi events.
 	*/
-	DSPLUG_USAGE_HINT_SYNTHESIZER			= 11,
+	DSPLUG_USAGE_HINT_SYNTHESIZER			= 14,
 										
 	/**
 	* The same as above, but with any number of input
@@ -155,7 +164,7 @@ typedef enum {
 	* (ports per each music channel) the part for a midi channel for a
 	* given port is: number of midi port * 16 + midi channel.
 	*/
-	DSPLUG_USAGE_HINT_MULTIPART_SYNTHESIZER 	= 12,
+	DSPLUG_USAGE_HINT_MULTIPART_SYNTHESIZER 	= 15,
  
 } DSPlug_PluginUsageHint;
 
@@ -209,6 +218,12 @@ typedef enum {
 	* implemented.
 	*/
 	DSPLUG_EVENT_TYPE_MIDI		= 2,
+	
+	/**
+	 * AUDIO Ports are for plugins to receive information such
+	 * as output/input latency, transport in frames, and other audio information.
+	 */
+	DSPLUG_EVENT_TYPE_AUDIO		= 3,
 	
 	
 } DSPlug_EventType;
@@ -297,7 +312,7 @@ typedef enum {
 	DSPLUG_PLUGIN_CONSTANT_MIN_SAMPLING_RATE	= 2, /**< Minimum sample rate that the plugin can work at default is 1 */
 	
 	DSPLUG_PLUGIN_CONSTANT_DEFAULT_CHANNELS		= 3, /**<  Default amount of channels the plugin works with, when  features DSPLUG_PLUGIN_FEATURE_VARIABLE_AUDIO_CHANNELS */
-	*/
+
 } DSPlug_PluginConstant;
 	
 
@@ -329,7 +344,6 @@ typedef struct {
  */
 typedef struct {
 	void * _private; /**< No access to the internals are provided */
-	void * _plugin_user_private;  /**< No access to the internals are provided */
 } DSPlug_PluginInstance;
 
 /**
@@ -360,5 +374,12 @@ typedef struct {
 	void * _private; /**< No access to the internals are provided */
 } DSPlug_EventQueue;
 
+/**
+ * This object stores the capabilities of a given plugin.
+ */
+typedef struct {
+	void * _private; /**< No access to the internals are provided */
+	void * _plugin_user_private;  /**< No access to the internals are provided */
+} DSPlug_Plugin;
 
 #endif /* dsplug_types.h */

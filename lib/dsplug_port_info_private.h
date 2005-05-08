@@ -1,76 +1,86 @@
-#ifndef DSPLUG_PORT_PRIVATE_H
-#define DSPLUG_PORT_PRIVATE_H
+#ifndef DSPlug_PORT_PRIVATE_H
+#define DSPlug_PORT_PRIVATE_H
 
 
-#include "dsplug/dsplug_types.h"
+#include "dsplug_types.h"
 
 /* ////////////////////////////////////////////////// */
 
 /* Port Info */
 
+/**
+ * Common data for all plugins
+ */
 typedef struct {
 
-	char * caption;
-
-	int default_channels;
-	
-
-} DSPLUG_Audio_Port_Info_Private;
-
-typedef struct {
-
-	char * caption;
-
-	DSPLUG_Event_Port_Type type;
-	
-
-} DSPLUG_Event_Port_Info_Private;
-
-typedef struct {
-
-	/* Strings */
 	char * caption;
 	char * name;
 	char * path;
 
+	DSPlug_PlugType plug_type;
+
+} DSPlug_CommonPortCapsPrivate;
+
+
+typedef struct {
+
+	DSPlug_CommonPortCapsPrivate common; /**< Basic Inheritance form */
+	
+	int channel_count;	
+
+} DSPlug_AudioPortCapsPrivate;
+
+typedef struct {
+
+	DSPlug_CommonPortCapsPrivate common; /**< Basic Inheritance form */
+	
+	DSPlug_EventType event_type;
+
+} DSPlug_EventPortCapsPrivate;
+
+/**
+ *	I'm not going to comment much on this class, as everything is pretty well mapped
+ *	in the host API
+ */
+typedef struct {
+
+	
 	/* Type */
-	DSPLUG_Control_Port_Type type;
+	DSPlug_ControlPortType type;
+	DSPlug_ControlPortNumericalHint numerical_hint; /**< This is only used if the type is numerical */
 
 	/* Flags */
-	DSPLUG_Boolean is_multipart;
-	DSPLUG_Boolean is_realtime_safe;
+	DSPlug_Boolean is_realtime_safe;
+	DSPlug_Boolean is_editable;
 
 	/* Display Helpers */
 	
 	
-	char ** option_names; /* for option ports */
-	int option_count;
+	char ** option_names; /**< array to strings for option names, only for numerical-enum port type */
+	int integer_steps; /**< amount of either integer steps, or amount of strings for option names, only for numerical-enum and numerical-int port type */
 
-	
-	int integer_steps; /* for int ports */
 
-	
-	void (*float_display_function)(float, char *); /* value display function */
+	void (*float_display_function)(float, char *); /**< Pointer tot he display function */
 
 	/* Defaults */
 
-	float default_float;
-	char * default_string;
-	void * default_data;
-	int default_data_len;
+	float default_numerical; /**< Default value for numerical port */
+	char * default_string; /**< Default value for string port */
+	void * default_data; /**< Default value for data port */
+	int default_data_len; /**< Default size for data port */
 
 	/* Callback to Plugin when setting and getting ports */
 	
-	void (*set_callback)(DSPLUG_Plugin *, int, float); /* float value set */
-	void (*set_callback_string)(DSPLUG_Plugin *, int, const char *); /* string value set */
-	void (*set_callback_data)(DSPLUG_Plugin *, int, void *, int); /* data value set */
+	void (*set_callback)(DSPlug_Plugin *, int, float); /**< Callback to float value set */
+	void (*set_callback_string)(DSPlug_Plugin *, int, const char *); /**< Callback to string value set */
+	void (*set_callback_data)(DSPlug_Plugin *, int, void *, int); /**< Callback to data value set */
 
-	float (*get_callback)(DSPLUG_Plugin *, int, float); /* float value get */
-	char * (*get_callback_string)(DSPLUG_Plugin *, int); /* string value get */
-	void (*get_callback_string_rtsafe)(DSPLUG_Plugin *, int, char *); /* string value get, rtsafe */
-	void (*get_callback_data)(DSPLUG_Plugin *, int, void **, int*); /* data value get */
+	float (*get_callback)(DSPlug_Plugin *, int, float); /**< Callback to float value get */
+	char * (*get_callback_string_norealtime)(DSPlug_Plugin *, int); /**< Callback to string value get, not realtime */
+	void (*get_callback_string)(DSPlug_Plugin *, int, char *); /**< Callback to string value get */
+	void (*get_callback_data)(DSPlug_Plugin *, int, void **, int*); /**< Callback to data value get */
 	
-} DSPLUG_Control_Port_Info_Private;
+} DSPlug_ControlPortCapsPrivate;
 
 
 /* ////////////////////////////////////////////////// */
@@ -80,18 +90,16 @@ typedef struct {
 
 typedef struct {
 
-	float ** channel_buffer_ptr; /* channel buffer connections array */
-	int channel_buffer_count; /* array size */
+	float ** channel_buffer_ptr; /**< array of pointers to the channel buffers */
 
-} DSPLUG_Audio_Port_Data_Private;
+} DSPlug_AudioPortDataPrivate;
 
 
 typedef struct {
 
-	/* just the event queue */
-	DSPLUG_Event_Queue * queue;
+	DSPlug_EventQueue * queue; /**< Pointer to the Event Queue */
 
-} DSPLUG_Event_Port_Data_Private;
+} DSPlug_EventPortDataPrivate;
 
 
 typedef struct {
@@ -100,7 +108,7 @@ typedef struct {
 	void * UI_changed_callback_userdata;
 
 
-} DSPLUG_Control_Port_Data_Private;
+} DSPlug_ControlPortDataPrivate;
 
 
 

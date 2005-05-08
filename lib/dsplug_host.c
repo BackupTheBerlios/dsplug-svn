@@ -1,3 +1,3 @@
 #include "dsplug_private.h"
-#include "dsplug/dsplug_host.h"
+#include "dsplug_host.h"
 
