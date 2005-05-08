@@ -91,15 +91,16 @@ typedef struct {
 typedef struct {
 
 	float ** channel_buffer_ptr; /**< array of pointers to the channel buffers */
+	int channel_count;
 
-} DSPlug_AudioPortDataPrivate;
+} DSPlug_AudioPortPrivate;
 
 
 typedef struct {
 
 	DSPlug_EventQueue * queue; /**< Pointer to the Event Queue */
 
-} DSPlug_EventPortDataPrivate;
+} DSPlug_EventPortPrivate;
 
 
 typedef struct {
@@ -108,7 +109,7 @@ typedef struct {
 	void * UI_changed_callback_userdata;
 
 
-} DSPlug_ControlPortDataPrivate;
+} DSPlug_ControlPortPrivate;
 
 
 

@@ -329,57 +329,57 @@ typedef enum {
  * Instance to the plugin library opened.
  */
 typedef struct {
-	void * _private; /**< No access to the internals are provided */
+	const void * _private; /**< No access to the internals are provided */
 } DSPlug_PluginLibrary;
 
 /**
  * This object stores the capabilities of a given plugin.
  */
 typedef struct {
-	void * _private; /**< No access to the internals are provided */
+	const void * _private; /**< No access to the internals are provided */
 } DSPlug_PluginCaps;
 
 /**
  * Instanced plugin. This object is using for the actual data processing.
  */
 typedef struct {
-	void * _private; /**< No access to the internals are provided */
+	const void * _private; /**< No access to the internals are provided */
 } DSPlug_PluginInstance;
 
 /**
  * This object stores the capabilities of an audio port.
  */
 typedef struct {
-	void * _private; /**< No access to the internals are provided */
+	const void * _private; /**< No access to the internals are provided */
 } DSPlug_AudioPortCaps;
 
 /**
  * This object stores the capabilities of an event port.
  */
 typedef struct {
-	void * _private; /**< No access to the internals are provided */
+	const void * _private; /**< No access to the internals are provided */
 } DSPlug_EventPortCaps;
 
 /**
  * This object stores the capabilities of a control port.
  */
 typedef struct {
-	void * _private; /**< No access to the internals are provided */
+	const void * _private; /**< No access to the internals are provided */
 } DSPlug_ControlPortCaps;
 
 /**
  * Event Queue. Holds a queue of events of a certain type.
  */
 typedef struct {
-	void * _private; /**< No access to the internals are provided */
+	const void * _private; /**< No access to the internals are provided */
 } DSPlug_EventQueue;
 
 /**
  * This object stores the capabilities of a given plugin.
  */
 typedef struct {
-	void * _private; /**< No access to the internals are provided */
-	void * _plugin_user_private;  /**< No access to the internals are provided */
+	const void * _private; /**< No access to the internals are provided */
+	const void * _user_private;  /**< No access to the internals are provided */
 } DSPlug_Plugin;
 
 #endif /* dsplug_types.h */

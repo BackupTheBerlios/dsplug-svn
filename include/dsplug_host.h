@@ -51,19 +51,13 @@ int DSPlug_PluginLibrary_get_plugin_count( DSPlug_PluginLibrary * );
  *	Using the handle, one can instance the plugin capabilities object
  *	for one of multiple plugins of the library.
  *	This is used to obtain all sorts of static information on the specific plugin
- *	without the need of instancing one.
+ *	without the need of instancing one. This object exists for the life of
+ *	the library and does not need to be deinitialized.
  *	\param i plugin index
  *	\return plugin capabilities, NULL on error
  */
 
-DSPlug_PluginCaps * DSPlug_PluginLibrary_get_plugin_caps( DSPlug_PluginLibrary * , int i );
-
-/**
- *	Uninitialize a plugin caps object. Call this when you dont need it anymore
- *	\param c plugin caps
- */
-
-void DSPlug_PluginLibrary_destroy_plugin_caps( DSPlug_PluginLibrary * , DSPlug_PluginCaps * c);
+DSPlug_PluginCaps DSPlug_PluginLibrary_get_plugin_caps( DSPlug_PluginLibrary * , int i );
 
 /**
 	This will instance a plugin from the plugin library. The plugin is
