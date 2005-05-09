@@ -54,6 +54,10 @@ typedef struct {
 	DSPlug_Boolean is_realtime_safe;
 	DSPlug_Boolean is_editable;
 
+	/* Multipart */
+
+	int musical_part;
+	
 	/* Display Helpers */
 	
 	

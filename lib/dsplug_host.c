@@ -920,6 +920,15 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
  DSPlug_Boolean DSPlug_ControlPortCaps_is_editable( DSPlug_ControlPortCaps p_control_caps ) {
 
 
+	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
+	 
+	 if (control_caps==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_is_editable: Calling with NULL ControlPortCaps ");
+		 return DSPLUG_FALSE; /* return anything */
+	 }
+
+	 return control_caps->is_editable;
 	 
 
  }
@@ -928,6 +937,15 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
  DSPlug_Boolean DSPlug_ControlPortCaps_is_realtime_safe( DSPlug_ControlPortCaps p_control_caps ) {
 
 
+	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
+	 
+	 if (control_caps==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_is_realtime_safe: Calling with NULL ControlPortCaps ");
+		 return DSPLUG_FALSE; /* return anything */
+	 }
+
+	 return control_caps->is_realtime_safe;
 	 
 
  }
@@ -935,8 +953,15 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  int DSPlug_ControlPortCaps_get_music_part( DSPlug_ControlPortCaps p_control_caps ) {
 
-
+	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
 	 
+	 if (control_caps==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_musical_part: Calling with NULL ControlPortCaps ");
+		 return 0; /* return anything */
+	 }
+
+	 return control_caps->musical_part;
 
  }
 
