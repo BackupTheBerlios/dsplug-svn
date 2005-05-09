@@ -253,10 +253,10 @@ typedef enum {
 
 typedef enum {
 
-	DSPLUG_CONTROL_PORT_TYPE_FLOAT		= 0, /**< Normal port, sets/reads values from 0.0f to 1.1f */
-	DSPLUG_CONTROL_PORT_TYPE_INTEGER	= 1, /**< Same as float port, except it has stepping */
-	DSPLUG_CONTROL_PORT_TYPE_ENUM		= 2, /**< Same as integer, but you can retrieve names for each value */
-	DSPLUG_CONTROL_PORT_TYPE_BOOL		= 3, /**< Only accepts >=0.5 as true, otherwise false */
+	DSPLUG_CONTROL_PORT_HINT_TYPE_FLOAT		= 0, /**< Normal port, sets/reads values from 0.0f to 1.1f */
+	DSPLUG_CONTROL_PORT_HINT_TYPE_INTEGER	= 1, /**< Same as float port, except it has stepping */
+	DSPLUG_CONTROL_PORT_HINT_TYPE_ENUM		= 2, /**< Same as integer, but you can retrieve names for each value */
+	DSPLUG_CONTROL_PORT_HINT_TYPE_BOOL		= 3, /**< Only accepts >=0.5 as true, otherwise false */
 
 } DSPlug_ControlPortNumericalHint;
 
@@ -323,7 +323,11 @@ typedef enum {
 /* //////////////////////////////////////////////////////// */
 
 /* Sorry, but you can't access the internals yourself, they are compiled-in */
+/* Still thought, you can use the following macro to test for the vailidty
+   of the following objects, simlpy pass them normally,not as pointers:
+*/
 
+#define DSPLUG_IS_OBJECT_VALID(m_o) ( (m_o)._private!=NULL )
 
 /**
  * Instance to the plugin library opened.

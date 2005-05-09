@@ -30,7 +30,7 @@ typedef struct {
 
 	/* Plugin Type */
 	
-	DSPlug_PluginUsageHint type;
+	DSPlug_PluginUsageHint usage_hint;
 
 
 	/* Array of pointers to AUDIO PORT Caps */

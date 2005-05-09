@@ -24,7 +24,7 @@ typedef struct {
 
 typedef struct {
 
-	DSPlug_CommonPortCapsPrivate common; /**< Basic Inheritance form */
+	DSPlug_CommonPortCapsPrivate common; /**< Basic Inheritance form, if GTK does this, I can too, this must always be the first member of the struct */
 	
 	int channel_count;	
 
@@ -32,8 +32,8 @@ typedef struct {
 
 typedef struct {
 
-	DSPlug_CommonPortCapsPrivate common; /**< Basic Inheritance form */
-	
+	DSPlug_CommonPortCapsPrivate common; /**< Basic Inheritance form, if GTK does this, I can too, this must always be the first member of the struct */
+
 	DSPlug_EventType event_type;
 
 } DSPlug_EventPortCapsPrivate;
@@ -44,7 +44,8 @@ typedef struct {
  */
 typedef struct {
 
-	
+	DSPlug_CommonPortCapsPrivate common; /**< Basic Inheritance form, if GTK does this, I can too, this must always be the first member of the struct */
+
 	/* Type */
 	DSPlug_ControlPortType type;
 	DSPlug_ControlPortNumericalHint numerical_hint; /**< This is only used if the type is numerical */

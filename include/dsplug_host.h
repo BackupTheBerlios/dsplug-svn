@@ -96,7 +96,7 @@ void DSPlug_PluginLibrary_destroy_plugin_instance( DSPlug_PluginLibrary * , DSPl
  *
 */
 
-void DSPlug_PluginCaps_get_caption( DSPlug_PluginCaps *, char * s );
+void DSPlug_PluginCaps_get_caption( DSPlug_PluginCaps, char * s );
 
 
 /** 
@@ -106,7 +106,7 @@ void DSPlug_PluginCaps_get_caption( DSPlug_PluginCaps *, char * s );
  *
 */
 
-void DSPlug_PluginCaps_get_author( DSPlug_PluginCaps *, char * s );
+void DSPlug_PluginCaps_get_author( DSPlug_PluginCaps, char * s );
 
 /** 
  *	Get the plugin copyright string.
@@ -115,7 +115,7 @@ void DSPlug_PluginCaps_get_author( DSPlug_PluginCaps *, char * s );
  *
 */
 
-void DSPlug_PluginCaps_get_copyright( DSPlug_PluginCaps *, char * s );
+void DSPlug_PluginCaps_get_copyright( DSPlug_PluginCaps, char * s );
 
 /** 
  *	Get the plugin version string.
@@ -126,7 +126,7 @@ void DSPlug_PluginCaps_get_copyright( DSPlug_PluginCaps *, char * s );
  *
 */
 
-void DSPlug_PluginCaps_get_version( DSPlug_PluginCaps *, char * s );
+void DSPlug_PluginCaps_get_version( DSPlug_PluginCaps, char * s );
 
 /** 
  *	Get the version up to where this plugin is compatible, it must be minor 
@@ -135,7 +135,7 @@ void DSPlug_PluginCaps_get_version( DSPlug_PluginCaps *, char * s );
  *	\param s pointer to a char buffer of size: DSPLUG_STRING_MAX_LEN
  *
 */
-void DSPlug_PluginCaps_get_compatible_version( DSPlug_PluginCaps *, char *s );
+void DSPlug_PluginCaps_get_compatible_version( DSPlug_PluginCaps, char *s );
 
 
 /** 
@@ -147,7 +147,7 @@ void DSPlug_PluginCaps_get_compatible_version( DSPlug_PluginCaps *, char *s );
  *	\param s pointer to a char buffer of size: DSPLUG_STRING_MAX_LEN
  *
  */
-void DSPlug_PluginCaps_get_unique_ID( DSPlug_PluginCaps *, char *s );
+void DSPlug_PluginCaps_get_unique_ID( DSPlug_PluginCaps, char *s );
 
 /** 
  *	Return the category path on where the plugin shall be displayed.
@@ -155,7 +155,7 @@ void DSPlug_PluginCaps_get_unique_ID( DSPlug_PluginCaps *, char *s );
  *	\param s pointer to a char buffer of size: DSPLUG_STRING_MAX_LEN
  *
  */
-void DSPlug_PluginCaps_get_category_path( DSPlug_PluginCaps *, char *s );
+void DSPlug_PluginCaps_get_category_path( DSPlug_PluginCaps, char *s );
 
 /**
  *	Plugin Usage Hint:
@@ -167,7 +167,7 @@ void DSPlug_PluginCaps_get_category_path( DSPlug_PluginCaps *, char *s );
  *	
  *	\return the plugin usage hint, which must be defined by plugins.
  */
-DSPlug_PluginUsageHint DSPlug_PluginCaps_get_plugin_usage_hint( DSPlug_PluginCaps * );
+DSPlug_PluginUsageHint DSPlug_PluginCaps_get_plugin_usage_hint( DSPlug_PluginCaps );
 
 /**
  *	Plugin Features:
@@ -180,7 +180,7 @@ DSPlug_PluginUsageHint DSPlug_PluginCaps_get_plugin_usage_hint( DSPlug_PluginCap
  *	\return true if the feature is supported, false otherwise
  */
 
-DSPlug_Boolean DSPlug_PluginCaps_has_feature( DSPlug_PluginCaps * , DSPlug_PluginFeature f);
+DSPlug_Boolean DSPlug_PluginCaps_has_feature( DSPlug_PluginCaps , DSPlug_PluginFeature f);
 
 /**
  *	Plugin Constants:
@@ -189,7 +189,7 @@ DSPlug_Boolean DSPlug_PluginCaps_has_feature( DSPlug_PluginCaps * , DSPlug_Plugi
  *	supports.
  *	\param c constant from enum
  */
-int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps * , DSPlug_PluginConstant c);
+int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps , DSPlug_PluginConstant c);
 
 /****************************/
 
@@ -205,7 +205,7 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps * , DSPlug_PluginConstant 
   *
   */
   
- int DSPlug_PluginCaps_get_port_count( DSPlug_PluginCaps *, DSPlug_PortType t);
+ int DSPlug_PluginCaps_get_port_count( DSPlug_PluginCaps, DSPlug_PortType t);
 
 
 /**
@@ -217,7 +217,7 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps * , DSPlug_PluginConstant 
   *	If the port index is invalid, an error message will be sent to stderr, and the function will do nothing.  By design, the API does not offer ways to handle this silly level of human errors.
   */
   
-void DSPlug_PluginCaps_get_port_caption( DSPlug_PluginCaps *, DSPlug_PortType t, int i, char * s );
+void DSPlug_PluginCaps_get_port_caption( DSPlug_PluginCaps, DSPlug_PortType t, int i, char * s );
 
 
 /**
@@ -231,7 +231,7 @@ void DSPlug_PluginCaps_get_port_caption( DSPlug_PluginCaps *, DSPlug_PortType t,
   *	If the port index is invalid, an error message will be sent to stderr, and the function will do nothing.  By design, the API does not offer ways to handle this silly level of human errors.
   */
   
-void DSPlug_PluginCaps_get_port_name( DSPlug_PluginCaps *, DSPlug_PortType t, int i, char * s );
+void DSPlug_PluginCaps_get_port_name( DSPlug_PluginCaps, DSPlug_PortType t, int i, char * s );
 
 
 /**
@@ -244,7 +244,7 @@ void DSPlug_PluginCaps_get_port_name( DSPlug_PluginCaps *, DSPlug_PortType t, in
   *	The return value, can then be ignored.
   */
   
-DSPlug_PlugType DSPlug_PluginCaps_get_port_plug_type( DSPlug_PluginCaps *, DSPlug_PortType t, int i);
+DSPlug_PlugType DSPlug_PluginCaps_get_port_plug_type( DSPlug_PluginCaps, DSPlug_PortType t, int i);
 
 
 /**
@@ -261,7 +261,7 @@ DSPlug_PlugType DSPlug_PluginCaps_get_port_plug_type( DSPlug_PluginCaps *, DSPlu
   *	If the port index is invalid, an error meessage will be sent to stderr, and the function will do nothing. By design, the API does not offer ways to handle this silly level of human errors.
   */
   
-void DSPlug_PluginCaps_get_port_path( DSPlug_PluginCaps *, DSPlug_PortType t, int i, char * s);
+void DSPlug_PluginCaps_get_port_path( DSPlug_PluginCaps, DSPlug_PortType t, int i, char * s);
 
 /**
  *	Get AUDIO port capabilities.
@@ -272,7 +272,7 @@ void DSPlug_PluginCaps_get_port_path( DSPlug_PluginCaps *, DSPlug_PortType t, in
  *	The return value, can then be ignored.
  */
 
-DSPlug_AudioPortCaps DSPlug_PluginCaps_get_audio_port_caps( DSPlug_PluginCaps *, int i );
+DSPlug_AudioPortCaps DSPlug_PluginCaps_get_audio_port_caps( DSPlug_PluginCaps, int i );
 
 /**
  *	Get EVENT port capabilities.
@@ -283,7 +283,7 @@ DSPlug_AudioPortCaps DSPlug_PluginCaps_get_audio_port_caps( DSPlug_PluginCaps *,
  *	The return value, can then be ignored.
  */
 
-DSPlug_EventPortCaps DSPlug_PluginCaps_get_event_port_caps( DSPlug_PluginCaps *, int i );
+DSPlug_EventPortCaps DSPlug_PluginCaps_get_event_port_caps( DSPlug_PluginCaps, int i );
   
 /**
  *	Get CONTROL port capabilities.
@@ -294,7 +294,7 @@ DSPlug_EventPortCaps DSPlug_PluginCaps_get_event_port_caps( DSPlug_PluginCaps *,
  *	The return value, can then be ignored.
  */
 
- DSPlug_ControlPortCaps DSPlug_PluginCaps_get_control_port_caps( DSPlug_PluginCaps *, int i );
+ DSPlug_ControlPortCaps DSPlug_PluginCaps_get_control_port_caps( DSPlug_PluginCaps, int i );
  
 /****************************/
 
@@ -309,7 +309,7 @@ DSPlug_EventPortCaps DSPlug_PluginCaps_get_event_port_caps( DSPlug_PluginCaps *,
  *
  */
 
-int DSPlug_AudioPortCaps_get_channel_count( DSPlug_AudioPortCaps * );
+int DSPlug_AudioPortCaps_get_channel_count( DSPlug_AudioPortCaps );
 
 
 /****************************/
@@ -326,7 +326,7 @@ int DSPlug_AudioPortCaps_get_channel_count( DSPlug_AudioPortCaps * );
  *	The return value, can then be ignored.
  */
 
-DSPlug_EventType DSPlug_EventPortCaps_get_event_type( DSPlug_EventPortCaps * );
+DSPlug_EventType DSPlug_EventPortCaps_get_event_type( DSPlug_EventPortCaps );
 
 /****************************/
 
@@ -339,7 +339,7 @@ DSPlug_EventType DSPlug_EventPortCaps_get_event_type( DSPlug_EventPortCaps * );
  *	\return the value type.
  */
  
-DSPlug_ControlPortType DSPlug_ControlPortCaps_get_type( DSPlug_ControlPortCaps * );
+DSPlug_ControlPortType DSPlug_ControlPortCaps_get_type( DSPlug_ControlPortCaps );
 
 /* Numerical Ports */
 /**
@@ -349,7 +349,7 @@ DSPlug_ControlPortType DSPlug_ControlPortCaps_get_type( DSPlug_ControlPortCaps *
  *	If the control port is not of type numerical-enum, then an error message is sent to stderr and the function does nothing. The return value can also be ignored. By design, the API does not offer ways to handle this silly level of human errors.
  */
 
-float DSPlug_ControlPortCaps_get_numerical_default( DSPlug_ControlPortCaps * );
+float DSPlug_ControlPortCaps_get_numerical_default( DSPlug_ControlPortCaps );
 
 /**
  *	Determine how a numerical port must display a value.
@@ -362,7 +362,7 @@ float DSPlug_ControlPortCaps_get_numerical_default( DSPlug_ControlPortCaps * );
  *	If the control port is not of type numerical, then an error message is sent to stderr and the function does nothing. By design, the API does not offer ways to handle this silly level of human errors.
  */
 
-void DSPlug_ControlPortCaps_get_numerical_display( DSPlug_ControlPortCaps * , float v , char *s);
+void DSPlug_ControlPortCaps_get_numerical_display( DSPlug_ControlPortCaps , float v , char *s);
 
 /**
  *	Get the edition hint for the numerical port, this helps the host
@@ -372,7 +372,7 @@ void DSPlug_ControlPortCaps_get_numerical_display( DSPlug_ControlPortCaps * , fl
  *	If the control port is not of type numerical, then an error message is sent to stderr and the function does nothing. By design, the API does not offer ways to handle this silly level of human errors.
  */
 
-DSPlug_ControlPortNumericalHint DSPlug_ControlPortCaps_get_numerical_hint( DSPlug_ControlPortCaps * );
+DSPlug_ControlPortNumericalHint DSPlug_ControlPortCaps_get_numerical_hint( DSPlug_ControlPortCaps );
 
 /* Numerical Port - Enum Port Options */
 
@@ -383,7 +383,7 @@ DSPlug_ControlPortNumericalHint DSPlug_ControlPortCaps_get_numerical_hint( DSPlu
  *	If the control port is not of type numerical-enum, then an error message is sent to stderr and the function does nothing. The return value can also be ignored. By design, the API does not offer ways to handle this silly level of human errors.
  */
 
-int DSPlug_ControlPortCaps_get_numerical_option_count( DSPlug_ControlPortCaps * );
+int DSPlug_ControlPortCaps_get_numerical_option_count( DSPlug_ControlPortCaps );
 
 /**
  *	Get the caption for a specific enum option.
@@ -392,7 +392,7 @@ int DSPlug_ControlPortCaps_get_numerical_option_count( DSPlug_ControlPortCaps * 
  *  
  *	If the control port is not of type numerical-enum, then an error message is sent to stderr and the function does nothing. The return value can also be ignored. By design, the API does not offer ways to handle this silly level of human errors.
  */
-void DSPlug_ControlPortCaps_get_numerical_option_caption( DSPlug_ControlPortCaps * , int o, char * s);
+void DSPlug_ControlPortCaps_get_numerical_option_caption( DSPlug_ControlPortCaps , int o, char * s);
 
 /* Numerical Port - Integer Options */
 
@@ -403,7 +403,7 @@ void DSPlug_ControlPortCaps_get_numerical_option_caption( DSPlug_ControlPortCaps
  *	If the control port is not of type numerical-integer, then an error message is sent to stderr and the function does nothing. The return value can also be ignored. By design, the API does not offer ways to handle this silly level of human errors.
  */
 
-int DSPlug_ControlPortCaps_get_numerical_integer_steps( DSPlug_ControlPortCaps * );
+int DSPlug_ControlPortCaps_get_numerical_integer_steps( DSPlug_ControlPortCaps );
 
 /* String Port */
 
@@ -413,7 +413,7 @@ int DSPlug_ControlPortCaps_get_numerical_integer_steps( DSPlug_ControlPortCaps *
  *	the plugin will return NULL if the port is not of this type.
  *	\return a constant string for the default value, NULL on error.
  */
-const char * DSPlug_ControlPortCaps_get_string_default( DSPlug_ControlPortCaps * );
+const char * DSPlug_ControlPortCaps_get_string_default( DSPlug_ControlPortCaps );
 
 /* Data Port */
 
@@ -425,7 +425,7 @@ const char * DSPlug_ControlPortCaps_get_string_default( DSPlug_ControlPortCaps *
   *	\return pointer constant to the data
 */
 
-const void* DSPlug_ControlPortCaps_get_raw_data_default( DSPlug_ControlPortCaps * , int *l );
+const void* DSPlug_ControlPortCaps_get_raw_data_default( DSPlug_ControlPortCaps , int *l );
 
 /* Misc Port Settings */
 
@@ -438,7 +438,7 @@ const void* DSPlug_ControlPortCaps_get_raw_data_default( DSPlug_ControlPortCaps 
  *	\return true if the port can be editable by the host
  */
 
-DSPlug_Boolean DSPlug_ControlPortCaps_is_editable( DSPlug_ControlPortCaps * );
+DSPlug_Boolean DSPlug_ControlPortCaps_is_editable( DSPlug_ControlPortCaps );
 
 /**
  *
@@ -469,7 +469,7 @@ DSPlug_Boolean DSPlug_ControlPortCaps_is_editable( DSPlug_ControlPortCaps * );
  *	\return true if the port can be set in realtime, false otherwise
  */
 
-DSPlug_Boolean DSPlug_ControlPortCaps_is_realtime_safe( DSPlug_ControlPortCaps * );
+DSPlug_Boolean DSPlug_ControlPortCaps_is_realtime_safe( DSPlug_ControlPortCaps );
 
 /**
  *
@@ -492,7 +492,7 @@ DSPlug_Boolean DSPlug_ControlPortCaps_is_realtime_safe( DSPlug_ControlPortCaps *
  *	\return the part number if it is assigned to one, or a negative value otherwise
  */
 
-int DSPlug_ControlPortCaps_get_music_part( DSPlug_ControlPortCaps * );
+int DSPlug_ControlPortCaps_get_music_part( DSPlug_ControlPortCaps );
 
 
 /****************************/
