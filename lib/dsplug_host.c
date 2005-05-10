@@ -12,7 +12,7 @@
 #include "dsplug_private.h"
 #include "dsplug_host.h"
 #include "dsplug_error_report.h"
-
+#include "dsplug_library.h"
 
 
 
@@ -29,9 +29,46 @@
 
 DSPlug_PluginLibrary * DSPlug_Host_open_plugin_library( const char * p ) {
 
-
-
-
+	int i;
+	
+	DSPlug_PluginLibraryPrivate * library;
+	DSPlug_PluginLibrary * library_public;
+	
+	char * full_path = DSPlug_LibraryCache_get_full_path(p);
+	
+		
+	if (DSPlug_LibraryCache_has_library(full_path)) {
+		
+		library = DSPlug_LibraryCache_get_library(full_path);
+		
+	} else {
+		
+		for (i=0;i<DSPlug_LibraryFile_handler_count();i++) {
+			
+			library = DSPlug_get_LibraryFile_handler_open(i,full_path);
+			if (library)
+				break;
+			
+			
+		}
+		
+		if (!library) {
+			free(full_path);	
+			return NULL; /* no library handler for this library*/
+		} else
+			DSPlug_LibraryCache_add_library(library);
+		
+		
+	}
+		
+	library->reference_count++;
+		
+	library_public = (DSPlug_PluginLibrary*)malloc(sizeof(DSPlug_PluginLibrary));;
+	library_public->_private=library;
+	
+	free(full_path);	
+	
+	return library_public;
 
 }
 
@@ -43,11 +80,16 @@ DSPlug_PluginLibrary * DSPlug_Host_open_plugin_library( const char * p ) {
 
 void DSPlug_Host_close_plugin_library( DSPlug_PluginLibrary *  p_library) {
 
-
-
-
-
-
+	DSPlug_PluginLibraryPrivate *library = (DSPlug_PluginLibraryPrivate *) (p_library->_private);
+	
+	free(p_library); /* just free the library */	
+	library->reference_count--; /* dereference the library */
+	
+	if (library->reference_count==0) { /* no one is using the library anymore */
+		
+		DSPlug_LibraryCache_remove_library(library);
+		DSPlug_LibraryFile_handler_close(library);
+	}
 }
 
 
@@ -194,16 +236,58 @@ DSPlug_PluginInstance * DSPlug_PluginLibrary_get_plugin_instance( DSPlug_PluginL
 
 }
 
-void DSPlug_PluginLibrary_destroy_plugin_instance( DSPlug_PluginLibrary *  p_library, DSPlug_PluginInstance * p) {
+void DSPlug_PluginLibrary_destroy_plugin_instance( DSPlug_PluginLibrary *  p_library, DSPlug_PluginInstance * p_instance) {
 
+	DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
+	int i;
+	
+	if (plugin_public==NULL || plugin==NULL) {
+		
+		DSPlug_report_error("HOST: DSPlug_PluginLibrary_destroy_plugin_instance: Calling with NULL PluginInstance object ");
+		return;
+	}
 
+	if (plugin->inside_process_callback_flag) {
+		
+		DSPlug_report_error("GRRR: STUPID PROGRAMMER! DONT DELETE THE INSTANCE WHILE YOU ARE STILL USING IT! I'M EXITING YOUR APP, NOW GO READ THE API DOCS!");
+		exit(255);
+	}
 
+	/* first, get rid of the programmer userdata for the plugin */
+	plugin->plugin_caps->destroy_plugin_userdata(plugin_public);
+	
+	for (i=0;i<plugin->audio_port_count;i++) {
+		
+		/* free the channel buffer connections of the port */
+		free(plugin->audio_ports[i]->channel_buffer_ptr);
+		/* free the port */		
+		free(plugin->audio_ports[i]);
+	}
+	
+	for (i=0;i<plugin->event_port_count;i++) {
+		
+		/* free the port */		
+		free(plugin->event_ports[i]);
+	}
+	
+	for (i=0;i<plugin->control_port_count;i++) {
+		
+		/* free the port */		
+		free(plugin->control_ports[i]);
+	}
+	
+	free(plugin);
+	free(plugin_public);
+
+	/* Successful Deinitialization! */
 }
 
 
 void DSPlug_PluginCaps_get_caption( DSPlug_PluginCaps p_caps, char * s ) {
 
 	DSPlug_PluginCapsPrivate *caps = (DSPlug_PluginCapsPrivate *)p_caps._private;
+	
 	if (caps==NULL) {
 
 		DSPlug_report_error("HOST: DSPlug_PluginCaps_get_caption: Calling with NULL PluginCaps object ");
@@ -809,9 +893,7 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 	 
 	 	 
 	 strcpy(s,control_caps->option_names[o]);
-	 
-	 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_option_count: Port is not DSPLUG_CONTROL_PORT_TYPE_NUMERICAL ");
-	 return ;
+ 
 
  }
 
@@ -848,8 +930,6 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 	 
 			 	 
 	 return control_caps->integer_steps;
-	 
-
  }
 
 
@@ -876,9 +956,6 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 	 }
 	 
 	 return control_caps->default_string;
-
-	 
-
  }
 
 
@@ -980,17 +1057,50 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  void DSPlug_PluginInstance_connect_audio_port( DSPlug_PluginInstance *p_instance, int i, int c, float * b) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_connect_audio_port: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->audio_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_connect_audio_port: Invalid Audio Port Index ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (c<0 || c>=plugin->audio_ports[i]->channel_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_connect_audio_port: Invalid Audio Port Channel Index ");
+		 return ; /* return anything */
+	 }
+
+	 plugin->audio_ports[i]->channel_buffer_ptr[c]=b;
  }
 
 
  void DSPlug_PluginInstance_connect_event_port( DSPlug_PluginInstance *p_instance, int i, DSPlug_EventQueue *q ) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_connect_event_port: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->event_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_connect_event_port: Invalid Event Port Index ");
+		 return ; /* return anything */
+	 }
+
+	 plugin->event_ports[i]->queue=q;
+	 	 
  }
 
 
@@ -999,24 +1109,107 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  void DSPlug_PluginInstance_set_control_numerical_port( DSPlug_PluginInstance *p_instance, int i , float v ) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_connect_event_port: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->control_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_set_control_numerical_port: Invalid Control Port Index ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_NUMERICAL) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_set_control_numerical_port: Port is not of numerical type ");
+		 return ; /* return anything */
+		 
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->set_callback_numerical) {
+		
+		 plugin->plugin_caps->control_port_caps[i]->set_callback_numerical(*plugin_public,i,v);
+	 } else {
+		 
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_set_control_numerical_port: Control Port not configured, Bug? ");
+	 }		 
 
  }
 
 
  void DSPlug_PluginInstance_set_control_string_port( DSPlug_PluginInstance *p_instance, int i , const char * s ) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_connect_event_port: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->control_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_set_control_string_port: Invalid Control Port Index ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_STRING) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_set_control_string_port: Port is not of string type ");
+		 return ; /* return anything */
+		 
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->set_callback_string) {
+		
+		 plugin->plugin_caps->control_port_caps[i]->set_callback_string(*plugin_public,i,s);
+	 } else {
+		 
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_set_string_string_port: Control Port not configured, Bug? ");
+	 }		 
+
 
  }
 
 
  void DSPlug_PluginInstance_set_control_data_port( DSPlug_PluginInstance *p_instance, int i , const void * d, int l ) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_set_control_data_port: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->control_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_set_control_data_port: Invalid Control Port Index ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_DATA) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_set_control_data_port: Port is not of data type ");
+		 return ; /* return anything */
+		 
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->set_callback_data) {
+		
+		 plugin->plugin_caps->control_port_caps[i]->set_callback_data(*plugin_public,i,d,l);
+	 } else {
+		 
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_set_data_data_port: Control Port not configured, Bug? ");
+	 }		 
+ 
 
  }
 
@@ -1024,14 +1217,70 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
  
  float DSPlug_PluginInstance_get_control_numerical_port( DSPlug_PluginInstance *p_instance, int i ) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_numerical_port: Calling with NULL PluginInstance ");
+		 return 0; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->control_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_numerical_port: Invalid Control Port Index ");
+		 return 0; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_NUMERICAL) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_numerical_port: Port is not of numerical type ");
+		 return 0; /* return anything */		 
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->set_callback_numerical) {
+		
+		 return plugin->plugin_caps->control_port_caps[i]->get_callback_numerical(*plugin_public,i);
+	 } else {
+		 
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_get_control_numerical_port: Control Port not configured, Bug? ");
+		 return 0;
+	 }		 
  }
 
 
  char * DSPlug_PluginInstance_get_control_string_port_no_realtime( DSPlug_PluginInstance *p_instance, int i ) {
 
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
+	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_norealtime: Calling with NULL PluginInstance ");
+		 return NULL; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->control_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_norealtime: Invalid Control Port Index ");
+		 return NULL; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_STRING) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_norealtime: Port is not of string type ");
+		 return NULL; /* return anything */
+		 
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->get_callback_string) {
+		
+		 return plugin->plugin_caps->control_port_caps[i]->get_callback_string_norealtime(*plugin_public,i);
+	 } else {
+		 
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_get_control_string_port_norealtime: Control Port not configured, Bug? ");
+		 return NULL;
+	 }		 
 
 	 
 
@@ -1039,6 +1288,35 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  void DSPlug_PluginInstance_get_control_string_port( DSPlug_PluginInstance *p_instance, int i , char * s ) {
 
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
+	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->control_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Invalid Control Port Index ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_STRING) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Port is not of string type ");
+		 return ; /* return anything */
+		 
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->get_callback_string) {
+		
+		 plugin->plugin_caps->control_port_caps[i]->get_callback_string(*plugin_public,i,s);
+	 } else {
+		 
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_get_control_string_port: Control Port not configured, Bug? ");
+	 }		 
 
 	 
 
@@ -1047,16 +1325,59 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  void DSPlug_PluginInstance_get_control_port_data( DSPlug_PluginInstance *p_instance, int i , void ** d, int * l ) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_data_port: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->control_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_data_port: Invalid Control Port Index ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_STRING) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_data_port: Port is not of data type ");
+		 return ; /* return anything */
+		 
+	 }
+	 
+	 if (plugin->plugin_caps->control_port_caps[i]->get_callback_data) {
+		
+		 plugin->plugin_caps->control_port_caps[i]->get_callback_data(*plugin_public,i,d,l);
+	 } else {
+		 
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_get_control_data_port: Control Port not configured, Bug? ");
+	 }		 
+
 
  }
 
 
- void DSPlug_PluginInstance_set_control_port_changed_callback( DSPlug_PluginInstance *p_instance, int i , void (*c)(int, void *) , void * u) {
+ void DSPlug_PluginInstance_set_UI_changed_control_port_callback( DSPlug_PluginInstance *p_instance, int i , void (*c)(int, void *) , void * u) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_PluginInstance_set_control_port_changed_callback: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (i<0 || i>=plugin->control_port_count) {
+		 
+		 DSPlug_report_error("HOST: DSPlug_PluginInstance_set_control_port_changed_callback: Invalid Control Port Index ");
+		 return ; /* return anything */
+	 }
+
+	 plugin->control_ports[i]->UI_changed_callback=c;
+	 plugin->control_ports[i]->UI_changed_callback_userdata=u;
 
  }
 
@@ -1070,9 +1391,27 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  void DSPlug_PluginInstance_process( DSPlug_PluginInstance *p_instance, int f ) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
 
+		 DSPlug_report_error("HOST: DSPlug_PluginInstance_process: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->process_callback && plugin->inside_process_callback_flag) {
+		
+		 plugin->inside_process_callback_flag=DSPLUG_TRUE;
+		 plugin->plugin_caps->process_callback(plugin_public,f); 
+		 plugin->inside_process_callback_flag=DSPLUG_FALSE;
+	 } else {
+
+		 if (plugin->inside_process_callback_flag)
+			 DSPlug_report_error("API: DSPlug_PluginInstance_process: Attempt to call process() when already processing! ");		 
+		 else
+			 DSPlug_report_error("API: DSPlug_PluginInstance_process: Plugin lacks process() callback, bug? ");		 
+	 }
  }
 
 
@@ -1083,8 +1422,22 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  void DSPlug_PluginInstance_reset( DSPlug_PluginInstance *p_instance) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_PluginInstance_reset: Calling with NULL PluginInstance ");
+		 return ; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->reset_callback) {
+		 
+		 plugin->plugin_caps->reset_callback(plugin_public); 
+	 } else {
+		 
+		 DSPlug_report_error("API: DSPlug_PluginInstance_reset: Plugin lacks reset() callback, bug? ");		 
+	 }
 
  }
 
@@ -1101,8 +1454,23 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  int DSPlug_PluginInstance_get_output_delay( DSPlug_PluginInstance *p_instance) {
 
-
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
 	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_PluginInstance_get_output_delay: Calling with NULL PluginInstance ");
+		 return 0; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->get_output_delay_callback) {
+		 
+		 return plugin->plugin_caps->get_output_delay_callback(plugin_public); 
+	 } 
+	 
+	 return 0;
+
+	 /* It's fine if a plugin lacks get_output_delay_callback callback.. some may not need it */
 
  }
 
@@ -1111,6 +1479,23 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
  int DSPlug_PluginInstance_get_skipped_initial_frames( DSPlug_PluginInstance *p_instance) {
 
 
+	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
+	 
+	 if (plugin_public==NULL || plugin==NULL) {
+
+		 DSPlug_report_error("HOST: DSPlug_PluginInstance_get_skipped_initial_frames: Calling with NULL PluginInstance ");
+		 return 0; /* return anything */
+	 }
+	 
+	 if (plugin->plugin_caps->get_skipped_initial_frames_callback) {
+		 
+		 return plugin->plugin_caps->get_skipped_initial_frames_callback(plugin_public); 
+	 } 
+
+	 /* It's fine if a plugin lacks get_skipped_initial_frames callback.. some may not need it */
+	 
+	 return 0;
 	 
 
  }

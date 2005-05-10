@@ -25,8 +25,8 @@ typedef struct {
 typedef struct {
 
 	DSPlug_CommonPortCapsPrivate common; /**< Basic Inheritance form, if GTK does this, I can too, this must always be the first member of the struct */
-	
-	int channel_count;	
+
+	int channel_count;
 
 } DSPlug_AudioPortCapsPrivate;
 
@@ -57,10 +57,10 @@ typedef struct {
 	/* Multipart */
 
 	int musical_part;
-	
+
 	/* Display Helpers */
-	
-	
+
+
 	char ** option_names; /**< array to strings for option names, only for numerical-enum port type */
 	int integer_steps; /**< amount of either integer steps, or amount of strings for option names, only for numerical-enum and numerical-int port type */
 
@@ -75,22 +75,22 @@ typedef struct {
 	int default_data_len; /**< Default size for data port */
 
 	/* Callback to Plugin when setting and getting ports */
-	
-	void (*set_callback)(DSPlug_Plugin *, int, float); /**< Callback to float value set */
-	void (*set_callback_string)(DSPlug_Plugin *, int, const char *); /**< Callback to string value set */
-	void (*set_callback_data)(DSPlug_Plugin *, int, void *, int); /**< Callback to data value set */
 
-	float (*get_callback)(DSPlug_Plugin *, int, float); /**< Callback to float value get */
-	char * (*get_callback_string_norealtime)(DSPlug_Plugin *, int); /**< Callback to string value get, not realtime */
-	void (*get_callback_string)(DSPlug_Plugin *, int, char *); /**< Callback to string value get */
-	void (*get_callback_data)(DSPlug_Plugin *, int, void **, int*); /**< Callback to data value get */
-	
+	void (*set_callback_numerical)(DSPlug_Plugin , int, float); /**< Callback to float value set */
+	void (*set_callback_string)(DSPlug_Plugin , int, const char *); /**< Callback to string value set */
+	void (*set_callback_data)(DSPlug_Plugin , int, const void *, int); /**< Callback to data value set */
+
+	float (*get_callback_numerical)(DSPlug_Plugin , int); /**< Callback to float value get */
+	char * (*get_callback_string_norealtime)(DSPlug_Plugin , int); /**< Callback to string value get, not realtime */
+	void (*get_callback_string)(DSPlug_Plugin , int, char *); /**< Callback to string value get */
+	void (*get_callback_data)(DSPlug_Plugin , int, void **, int*); /**< Callback to data value get */
+
 } DSPlug_ControlPortCapsPrivate;
 
 
 /* ////////////////////////////////////////////////// */
 
-	
+
 /* Port Data */
 
 typedef struct {
