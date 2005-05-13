@@ -3,6 +3,7 @@
 
 
 #include "dsplug_types.h"
+#include "dsplug_private.h"
 
 
 /* *
@@ -24,7 +25,7 @@ void DSPlug_LibraryFile_handler_close(DSPlug_PluginLibraryPrivate *p_library);
 
 typedef struct {
 
-	DSPlug_PluginLibraryPrivate (*open_callback)(const char *p_full_path);
+	DSPlug_PluginLibraryPrivate * (*open_callback)(const char *p_full_path);
 	void (*close_callback)(DSPlug_PluginLibraryPrivate *p_library);
 } DSPlug_LibraryHandler;
 

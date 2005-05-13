@@ -1,16 +1,19 @@
 
 #include "dsplug_library.h"
-
+#include "dsplug_error_report.h"
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 
 typedef struct {
 
 	DSPlug_PluginLibraryPrivate * library;
 
-} LibraryCacheElement;
+} DSPlug_LibraryCacheElement;
 
 
-static LibraryCacheElement *library_cache_elements=0;
+static DSPlug_LibraryCacheElement *library_cache_elements=0;
 static int library_cache_element_count=0;
 
 /* *
@@ -20,7 +23,7 @@ static int library_cache_element_count=0;
 char * DSPlug_LibraryCache_get_full_path(const char *p_path) {
 
 	char *full;
-	static const int MAX_FULLCWD_SIZE=4096; //enough?
+	static const int MAX_FULLCWD_SIZE=4096; /* enough? */
 	char *aux_cwd;
 
 	if (strlen(p_path)==0)
@@ -61,6 +64,7 @@ char * DSPlug_LibraryCache_get_full_path(const char *p_path) {
 
 DSPlug_PluginLibraryPrivate *DSPlug_LibraryCache_get_library(const char *p_full_path) {
 
+    int i;
 	for (i=0;i<library_cache_element_count;i++)
 		if (!strcmp(library_cache_elements[i].library->library_cache_full_path,p_full_path))
 			return library_cache_elements[i].library;
@@ -69,7 +73,7 @@ DSPlug_PluginLibraryPrivate *DSPlug_LibraryCache_get_library(const char *p_full_
 }
 void DSPlug_LibraryCache_add_library(DSPlug_PluginLibraryPrivate *p_library) {
 
-	library_handler_element_count++;
+	library_cache_element_count++;
 	/* looong line! */
 	library_cache_elements=(DSPlug_LibraryCacheElement*)realloc(library_cache_elements,sizeof(DSPlug_LibraryCacheElement)*library_cache_element_count);
 	library_cache_elements[library_cache_element_count-1].library=p_library;
@@ -121,7 +125,7 @@ DSPlug_PluginLibraryPrivate *DSPlug_get_LibraryFile_handler_open(int p_handler_i
 	if (p_handler_index<0 || p_handler_index>=library_handler_element_count)
 		return NULL;
 
-	new_library = library_handler_elements[i]->open_callback(p_full_path);
+	new_library = library_handler_elements[p_handler_index].open_callback(p_full_path);
 	if (new_library==NULL)
 		return NULL;
 
@@ -137,7 +141,7 @@ DSPlug_PluginLibraryPrivate *DSPlug_get_LibraryFile_handler_open(int p_handler_i
 
 void DSPlug_LibraryFile_handler_close(DSPlug_PluginLibraryPrivate *p_library) {
 
-	library_handler_elements[p_library->library_file_handler_index]->close_callback(p_library);
+	library_handler_elements[p_library->library_file_handler_index].close_callback(p_library);
 
 }
 
