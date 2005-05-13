@@ -8,6 +8,7 @@ targets = [\
         ];
         
 StaticLibrary('DSPlug', targets, CCFLAGS=unix_flags)
+SharedLibrary('DSPlug', targets, CCFLAGS=unix_flags)
         
 
         
