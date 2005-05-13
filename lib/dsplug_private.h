@@ -113,8 +113,11 @@ typedef struct {
 	/* Library file handler stuff */
 	int reference_count; /**< Amount of times this library has been opened */
 	int library_file_handler_index; /* library file handler in charge of it */
-	void * library_file_handler_private; /* library file handler private data */
-	char * library_file_handler_full_path;
+	char * library_cache_full_path; /* full path for the library cache */
+
+	/* library file handler private data, file handlers can use this freely */
+	void * library_file_handler_private;
+
 
 
 } DSPlug_PluginLibraryPrivate;
