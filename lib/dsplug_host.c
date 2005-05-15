@@ -746,28 +746,6 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  /* Numerical Ports */
 
- float DSPlug_ControlPortCaps_get_numerical_default( DSPlug_ControlPortCaps p_control_caps ) {
-
-
-	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
-
-	 if (control_caps==NULL) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_default: Calling with NULL ControlPortCaps ");
-		 return 0; /* return something */
-	 }
-
-	 if (control_caps->type!=DSPLUG_CONTROL_PORT_TYPE_NUMERICAL) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_default: Port is not DSPLUG_CONTROL_PORT_TYPE_NUMERICAL ");
-		 return 0;
-
-	 }
-
-	 return control_caps->default_numerical;
-
- }
-
 
  void DSPlug_ControlPortCaps_get_numerical_display( DSPlug_ControlPortCaps p_control_caps , float v , char *s) {
 
@@ -827,74 +805,6 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
  }
 
 
- int DSPlug_ControlPortCaps_get_numerical_option_count( DSPlug_ControlPortCaps p_control_caps ) {
-
-
-	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
-
-	 if (control_caps==NULL) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_option_count: Calling with NULL ControlPortCaps ");
-		 return 0; /* return something */
-	 }
-
-	 if (control_caps->type!=DSPLUG_CONTROL_PORT_TYPE_NUMERICAL) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_option_count: Port is not DSPLUG_CONTROL_PORT_TYPE_NUMERICAL ");
-		 return 0;
-
-	 }
-
-	 if (control_caps->numerical_hint!=DSPLUG_CONTROL_PORT_HINT_TYPE_ENUM) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_option_count: Port is not DSPLUG_CONTROL_PORT_TYPE_NUMERICAL ");
-		 return 0;
-
-	 }
-
-	 return control_caps->integer_steps;
-
-
- }
-
-
- void DSPlug_ControlPortCaps_get_numerical_option_caption( DSPlug_ControlPortCaps p_control_caps , int o, char * s) {
-
-
-	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
-
-	 if (control_caps==NULL) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_option_count: Calling with NULL ControlPortCaps ");
-		 return ;
-	 }
-
-	 if (control_caps->type!=DSPLUG_CONTROL_PORT_TYPE_NUMERICAL) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_option_count: Port is not DSPLUG_CONTROL_PORT_TYPE_NUMERICAL ");
-		 return ;
-
-	 }
-
-	 if (control_caps->numerical_hint!=DSPLUG_CONTROL_PORT_HINT_TYPE_ENUM) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_option_count: Port is not DSPLUG_CONTROL_PORT_HINT_TYPE_ENUM ");
-		 return ;
-
-	 }
-
-	 if (o<0 || o>=control_caps->integer_steps) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_numerical_option_count: Invalid option index ");
-		 return ;
-
-	 }
-
-
-	 strcpy(s,control_caps->option_names[o]);
-
-
- }
 
 
 
@@ -932,61 +842,41 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
  }
 
 
-
-
- /* String Port */
-
-
- const char * DSPlug_ControlPortCaps_get_string_default( DSPlug_ControlPortCaps p_control_caps ) {
+ DSPlug_Boolean DSPlug_ControlPortCaps_is_numerical_integer_enum( DSPlug_ControlPortCaps p_control_caps) {
 
 	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
 
 	 if (control_caps==NULL) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_string_default: Calling with NULL ControlPortCaps ");
-		 return NULL;
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_is_numerical_integer_enum: Calling with NULL ControlPortCaps ");
+		 return 0; /* return something */
 	 }
 
-	 if (control_caps->type!=DSPLUG_CONTROL_PORT_TYPE_STRING) {
+	 if (control_caps->type!=DSPLUG_CONTROL_PORT_TYPE_NUMERICAL) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_string_default: Port is not DSPLUG_CONTROL_PORT_TYPE_STRING ");
-		 return NULL;
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_is_numerical_integer_enum: Port is not DSPLUG_CONTROL_PORT_TYPE_NUMERICAL ");
+		 return 0;
 
 	 }
 
-	 return control_caps->default_string;
+	 if (control_caps->numerical_hint!=DSPLUG_CONTROL_PORT_HINT_TYPE_INTEGER) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_is_numerical_integer_enum: Port is not DSPLUG_CONTROL_PORT_HINT_TYPE_INTEGER ");
+		 return 0;
+
+	 }
+
+	 return control_caps->integer_is_enum;
+
+
  }
+
+ /* String Port */
 
 
 
 
  /* Data Port */
-
-
- const void* DSPlug_ControlPortCaps_get_raw_data_default( DSPlug_ControlPortCaps p_control_caps , int *l ) {
-
-
-	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
-
-	 if (control_caps==NULL) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_raw_data_default: Calling with NULL ControlPortCaps ");
-		 return NULL;
-	 }
-
-	 if (control_caps->type!=DSPLUG_CONTROL_PORT_TYPE_DATA) {
-
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_raw_data_default: Port is not DSPLUG_CONTROL_PORT_TYPE_DATA ");
-		 return NULL;
-
-	 }
-
-	 *l=control_caps->default_data_len;
-	 return control_caps->default_data;
-
-
- }
-
 
 
 
@@ -1248,7 +1138,7 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
  }
 
 
- char * DSPlug_PluginInstance_get_control_string_port_no_realtime( DSPlug_PluginInstance *p_instance, int i ) {
+ char * DSPlug_PluginInstance_get_control_string_port( DSPlug_PluginInstance *p_instance, int i ) {
 
 	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
 	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
@@ -1285,7 +1175,7 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
  }
 
- void DSPlug_PluginInstance_get_control_string_port( DSPlug_PluginInstance *p_instance, int i , char * s ) {
+ void DSPlug_PluginInstance_get_control_string_port_realtime( DSPlug_PluginInstance *p_instance, int i , char * s ) {
 
 	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
 	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
@@ -1470,32 +1360,6 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 	 return 0;
 
 	 /* It's fine if a plugin lacks get_output_delay_callback callback.. some may not need it */
-
- }
-
-
-
- int DSPlug_PluginInstance_get_skipped_initial_frames( DSPlug_PluginInstance *p_instance) {
-
-
-	 DSPlug_Plugin *plugin_public = (DSPlug_Plugin *)p_instance->_private;
-	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate *)plugin_public->_private;
-
-	 if (plugin_public==NULL || plugin==NULL) {
-
-		 DSPlug_report_error("HOST: DSPlug_PluginInstance_get_skipped_initial_frames: Calling with NULL PluginInstance ");
-		 return 0; /* return anything */
-	 }
-
-	 if (plugin->plugin_caps->get_skipped_initial_frames_callback) {
-
-		 return plugin->plugin_caps->get_skipped_initial_frames_callback(plugin_public);
-	 }
-
-	 /* It's fine if a plugin lacks get_skipped_initial_frames callback.. some may not need it */
-
-	 return 0;
-
 
  }
 

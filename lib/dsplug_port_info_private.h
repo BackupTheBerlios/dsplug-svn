@@ -61,18 +61,15 @@ typedef struct {
 	/* Display Helpers */
 
 
-	char ** option_names; /**< array to strings for option names, only for numerical-enum port type */
-	int integer_steps; /**< amount of either integer steps, or amount of strings for option names, only for numerical-enum and numerical-int port type */
+	int integer_steps; /**< amount of either integer steps, or amount of strings for option names, only for  numerical-int port type */
+	DSPlug_Boolean integer_is_enum;
 
 
 	void (*float_display_function)(float, char *); /**< Pointer tot he display function */
 
 	/* Defaults */
 
-	float default_numerical; /**< Default value for numerical port */
-	char * default_string; /**< Default value for string port */
-	void * default_data; /**< Default value for data port */
-	int default_data_len; /**< Default size for data port */
+	int realtime_port_max_len;
 
 	/* Callback to Plugin when setting and getting ports */
 

@@ -9,6 +9,7 @@
 
 /* Defines */
 
+/**< dsplug string max buffer size, including zero */
 #define DSPLUG_STRING_PARAM_MAX_LEN 512
 
 /* //////////////////////////////////////////////////////// */
@@ -177,7 +178,6 @@ typedef enum {
 
 	DSPLUG_PLUG_INPUT 	= 0, /**< Port Provides Input */
 	DSPLUG_PLUG_OUTPUT 	= 1, /**< Port Provides Output */
-	DSPLUG_PLUG_BIDI 	= 2, /**< Port Provides Both Input And Output (bidirectional)*/
 
 } DSPlug_PlugType;
 
@@ -254,9 +254,8 @@ typedef enum {
 typedef enum {
 
 	DSPLUG_CONTROL_PORT_HINT_TYPE_FLOAT		= 0, /**< Normal port, sets/reads values from 0.0f to 1.1f */
-	DSPLUG_CONTROL_PORT_HINT_TYPE_INTEGER	= 1, /**< Same as float port, except it has stepping */
-	DSPLUG_CONTROL_PORT_HINT_TYPE_ENUM		= 2, /**< Same as integer, but you can retrieve names for each value */
-	DSPLUG_CONTROL_PORT_HINT_TYPE_BOOL		= 3, /**< Only accepts >=0.5 as true, otherwise false */
+	DSPLUG_CONTROL_PORT_HINT_TYPE_INTEGER	= 1, /**< Same as float port, except it has stepping. **WARNING** When saving the port value, *ALWAYS* save either both the port value and the steps, or the integer value. This way if the plugin adds more steps (as in, more possible values) you can remain compatible with it. */
+	DSPLUG_CONTROL_PORT_HINT_TYPE_BOOL		= 2, /**< Only accepts >=0.5 as true, otherwise false */
 
 } DSPlug_ControlPortNumericalHint;
 
@@ -386,4 +385,25 @@ typedef struct {
 	const void * _user_private;  /**< No access to the internals are provided */
 } DSPlug_Plugin;
 
+/**
+ * This plugin is used upon creation of a plugin
+ */
+typedef struct {
+	const void * _private; /**< No access to the internals are provided */
+} DSPlug_PluginCreatio;
+
+/**
+ * This plugin is used upon creation of a plugin library
+ */
+typedef struct {
+	const void * _private; /**< No access to the internals are provided */
+} DSPlug_LibraryCreation;
+
+/**
+ * This plugin is used upon creation of a plugin control port
+ */
+typedef struct {
+	const void * _private; /**< No access to the internals are provided */
+} DSPlug_ControlPortCreation;
+		
 #endif /* dsplug_types.h */

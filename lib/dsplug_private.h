@@ -20,12 +20,13 @@ typedef struct {
 
 
 	char *info_caption;
-	char *info_name;
 	char *info_author;
 	char *info_copyright;
 	char *info_version;
 	char *info_compatible_version;
 	char *info_unique_ID;
+	char *info_description;
+	char *info_HTTP_URL;
 	char *info_category_path;
 
 	/* Plugin Type */
@@ -67,7 +68,6 @@ typedef struct {
 	/* Misc Callbacks */
 
 	int  (*get_output_delay_callback)(DSPlug_Plugin *);
-	int  (*get_skipped_initial_frames_callback)(DSPlug_Plugin *);
 
 
 } DSPlug_PluginCapsPrivate;
@@ -97,6 +97,7 @@ typedef struct {
 
 	DSPlug_Boolean inside_process_callback_flag; /* This flag is on when plugin is inside process callback */
 
+	float sampling_rate; /* sampling rate in HZ at which the plugin was instanced */
 } DSPlug_PluginPrivate;
 
 /* ////////////////////////////////////////////////////////// */
@@ -117,7 +118,6 @@ typedef struct {
 
 	/* library file handler private data, file handlers can use this freely */
 	void * library_file_handler_private;
-
 
 
 } DSPlug_PluginLibraryPrivate;

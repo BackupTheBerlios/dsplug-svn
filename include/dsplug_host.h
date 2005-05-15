@@ -42,6 +42,8 @@ void DSPlug_Host_close_plugin_library( DSPlug_PluginLibrary * );
  *	versions, as well as a plugin having a low quality and
  *	hi quality version, and so on. Or just a library of misc plugins.
  *	The amount of supported plugins can be retrived with this function
+ * 	WARNING: The index of a plugin inside the library can change freely, so
+ * 		ALWAYS reference it for it's unique_ID+version ONLY.
  *	\return a number equal or greater to one
  */
 
@@ -125,7 +127,6 @@ void DSPlug_PluginCaps_get_copyright( DSPlug_PluginCaps, char * s );
  *	\param s pointer to a char buffer of size: DSPLUG_STRING_MAX_LEN
  *
 */
-
 void DSPlug_PluginCaps_get_version( DSPlug_PluginCaps, char * s );
 
 /**
@@ -148,6 +149,24 @@ void DSPlug_PluginCaps_get_compatible_version( DSPlug_PluginCaps, char *s );
  *
  */
 void DSPlug_PluginCaps_get_unique_ID( DSPlug_PluginCaps, char *s );
+
+/**
+ *	Return a short description for the plugin, so users can find out
+ *	what this plugin is meant for.
+ *	\param s pointer to a char buffer of size: DSPLUG_STRING_MAX_LEN
+ *
+ */
+void DSPlug_PluginCaps_get_description( DSPlug_PluginCaps, char *s );
+
+/**
+ *	Return location of the home page url, for obtaining docummentation and info.
+ *	If the host is connected to the internet, then it can open a web page
+ * 	with the full and more complete docummentation for this plugin.
+ * 	for example: "http://www.myplugin.org/doc", or "" for no URL.
+ *	\param s pointer to a char buffer of size: DSPLUG_STRING_MAX_LEN
+ * *
+ */
+void DSPlug_PluginCaps_get_HTTP_URL( DSPlug_PluginCaps, char *s );
 
 /**
  *	Return the category path on where the plugin shall be displayed.
@@ -374,36 +393,27 @@ void DSPlug_ControlPortCaps_get_numerical_display( DSPlug_ControlPortCaps , floa
 
 DSPlug_ControlPortNumericalHint DSPlug_ControlPortCaps_get_numerical_hint( DSPlug_ControlPortCaps );
 
-/* Numerical Port - Enum Port Options */
-
-/**
- *	Get the amount of enumeration options for the "enum" numerical hint.
- *	\returns amount of options
- *
- *	If the control port is not of type numerical-enum, then an error message is sent to stderr and the function does nothing. The return value can also be ignored. By design, the API does not offer ways to handle this silly level of human errors.
- */
-
-int DSPlug_ControlPortCaps_get_numerical_option_count( DSPlug_ControlPortCaps );
-
-/**
- *	Get the caption for a specific enum option.
- *	\param o option number
- *	\param s pointer to achar buffer of size: DSPLUG_STRING_MAX_LEN
- *
- *	If the control port is not of type numerical-enum, then an error message is sent to stderr and the function does nothing. The return value can also be ignored. By design, the API does not offer ways to handle this silly level of human errors.
- */
-void DSPlug_ControlPortCaps_get_numerical_option_caption( DSPlug_ControlPortCaps , int o, char * s);
 
 /* Numerical Port - Integer Options */
 
 /**
  *	Get the steps for the integer value.
+ * 	NOTE: **WARNING** When saving the port value, *ALWAYS* save either both the port value and the steps, or the integer final value. This way if the plugin adds more steps (as in, more possible values) you can remain compatible with it.
  *	\return amount of steps
  *
  *	If the control port is not of type numerical-integer, then an error message is sent to stderr and the function does nothing. The return value can also be ignored. By design, the API does not offer ways to handle this silly level of human errors.
  */
 
 int DSPlug_ControlPortCaps_get_numerical_integer_steps( DSPlug_ControlPortCaps );
+
+/**
+ *	Check if the integer port is actually an enumerated value (a set of options).
+ * 	This is just to hint the host on a better way to display it to the user.
+ *
+ *	If the control port is not of type numerical-integer, then an error message is sent to stderr and the function does nothing. The return value can also be ignored. By design, the API does not offer ways to handle this silly level of human errors.
+ */
+
+DSPlug_Boolean DSPlug_ControlPortCaps_is_numerical_integer_enum( DSPlug_ControlPortCaps );
 
 /* String Port */
 
@@ -520,6 +530,9 @@ void DSPlug_PluginInstance_connect_audio_port( DSPlug_PluginInstance * , int i, 
  *	Connect an event port to a given event queue
  *	If the port is bidirectional, then the processing is done inplace,
  *      as in, the port will free the queue and fill it with new events.
+ *	If not, you can safely feed the same input event queue instance to
+ *	many plugins, as they should not modify it. This is useful
+ *	for connecting the mastertrack and audio master event queues.
  *
  *	\param i event port index
  *	\param q event queue channel
@@ -574,29 +587,37 @@ float DSPlug_PluginInstance_get_control_numerical_port( DSPlug_PluginInstance * 
 
 
 /**
- *	Get a string, this can only be used in non realtine,
- *	but the string can have any length. Non-editable ports
- *      may use this for saving their configuration in text-based
- *	format.
- *	This is ignored on input ports.
+ *	Get a C-String, the data is given for you to handle (free it yourself)
+ *      Some complex plugins can use this for saving their configuration in text-based format
+ *	You must use this function to get strings if the port is NOT defined realtime.
  *	WARNING THIS FUNCTION CANT BE CALLED ON A REALTIME THREAD!
  *
  *	\param i control port index
  *	\return a C-String, the host is in charge of freeing it
  */
-char * DSPlug_PluginInstance_get_control_string_port_no_realtime( DSPlug_PluginInstance * , int i );
+char * DSPlug_PluginInstance_get_control_string_port( DSPlug_PluginInstance * , int i );
 
 /**
- *	Get a string value.
+ *	Get a string value. The max length of this string is predetermined by the plugin
  *	This is ignored on output ports.
- *	If the port supports realtime, this can safely called on a RT-Thread,
- *	however, the return value is clamped to a maximum fixed length.
+ *	You must use this function instead of the above one when the ports are realtime.
  *
  *	\param i control port index
  *	\param s pointer to a char buffer of size: DSPLUG_STRING_PORT_GET_MAX_LEN
  */
 
- void DSPlug_PluginInstance_get_control_string_port( DSPlug_PluginInstance * , int i , char * s );
+ void DSPlug_PluginInstance_get_control_string_port_realtime( DSPlug_PluginInstance * , int i , char * s );
+
+ /**
+  *	Get the max length of the realtime port string. This is fixed for
+  *	the port, so it is warranted that it is realtime safe.
+  *	This function only works for reealtime string ports.
+  *
+  *	\param i control port index
+  *	\return the length in characters for the string buffer + 0 chracter
+  */
+
+ int DSPlug_PluginInstance_get_control_string_port_realtime_max_length( DSPlug_PluginInstance * , int i );
 
 /**
  *	Get a data chunk, this can only be used in non realtine,
@@ -686,13 +707,6 @@ void DSPlug_PluginInstance_reset( DSPlug_PluginInstance * );
 
 int DSPlug_PluginInstance_get_output_delay( DSPlug_PluginInstance * );
 
-/**
- *	Returns the skipped initial frames when processing, some plugins will ask you
- *	to skip some of the initial frames of processing because they are junk.
- *	\return frames skipped, default is 0 (zero, no skip)
- */
-
-int DSPlug_PluginInstance_get_skipped_initial_frames( DSPlug_PluginInstance * );
 
 /**********************/
 
