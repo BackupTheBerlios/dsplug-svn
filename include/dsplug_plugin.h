@@ -6,6 +6,7 @@
 #ifndef DSPlUG_PLUGIN_H
 #define DSPlUG_PLUGIN_H
 
+#include "dsplug_types.h"
 
 /**************************
 * Plugin Library Creation *
@@ -188,29 +189,29 @@ void DSPlug_PluginCreation_add_control_port( DSPlug_PluginCreation * , DSPlug_Pl
  * Instance a control port creation object. For the specific type of port.
  * \param set_cbk User-Callback for setting a value
  * \param get_cbk User-Callback for getting a value
- * \param disp_func User-Callback for the display function, if supplied, it hints the host on how to display the port.
+ * \param disp_func User-Callback for the display function, if supplied, it hints the host on how to display the port. passing NULL means using the default one
  * \return a Control Port Creation instance.
 */
-DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_float( void (*set_cbk)(DSPlug_Plugin , int, float) ,  float (*get_cbk)(DSPlug_Plugin , int) , void (*disp_func)(float, char *)=NULL);
+DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_float( void (*set_cbk)(DSPlug_Plugin , int, float) ,  float (*get_cbk)(DSPlug_Plugin , int) , void (*disp_func)(float, char *));
 /**
  * Instance a control port creation object. For the specific type of port.
  * \param steps Integer steps. This is to hint the host that you want values of type integer, and the range of them. The actual value is obtained by doing port_value*steps formula.
  * \param is_enum Set to true if the port must be displayed as an ennumerated options value.
  * \param set_cbk User-Callback for setting a value
  * \param get_cbk User-Callback for getting a value
- * \param disp_func User-Callback for the display function, if supplied, it hints the host on how to display the port.
+ * \param disp_func User-Callback for the display function, if supplied, it hints the host on how to display the port. passing NULL means using the default one
  * \return a Control Port Creation instance.
  */
-DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_integer( int steps, DSPlug_Boolean is_enum, void (*set_cbk)(DSPlug_Plugin , int, float) ,  float (*get_cbk)(DSPlug_Plugin , int) , void (*disp_func)(float, char *)=NULL);
+DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_integer( int steps, DSPlug_Boolean is_enum, void (*set_cbk)(DSPlug_Plugin , int, float) ,  float (*get_cbk)(DSPlug_Plugin , int) , void (*disp_func)(float, char *));
 /**
  * Instance a control port creation object. For the specific type of port.
  * \param set_cbk User-Callback for setting a value
  * \param get_cbk User-Callback for getting a value
- * \param disp_func User-Callback for the display function, if supplied, it hints the host on how to display the port.
+ * \param disp_func User-Callback for the display function, if supplied, it hints the host on how to display the port. passing NULL means using the default one
  * \return a Control Port Creation instance.
  */
 
-DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( void (*set_cbk)(DSPlug_Plugin , int, float) , float (*get_cbk)(DSPlug_Plugin , int) , void (*disp_func)(float, char *)=NULL);
+DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( void (*set_cbk)(DSPlug_Plugin , int, float) , float (*get_cbk)(DSPlug_Plugin , int) , void (*disp_func)(float, char *));
 
 /**
  * Instance a control port creation object. For the specific type of port.
@@ -224,7 +225,7 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
  * \param get_cbk User-Callback for getting a value
  * \return a Control Port Creation instance.
  */
- DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_string( (*set_cbk)(DSPlug_Plugin , int, const char*) , char * (*get_cbk)(DSPlug_Plugin , int) );
+ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_string( void (*set_cbk)(DSPlug_Plugin , int, const char*) , char * (*get_cbk)(DSPlug_Plugin , int) );
 
  /**
   * Instance a control port creation object. For the specific type of port.
@@ -233,13 +234,13 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
   * 	*WARNING*: Trying to use sprintf or *printf*, or other standard library
   * 	string operations in the realtime thread may be dangerous for realtime!!
   *
-  * \param maxlen max length of the string, defaults to DSPLUG_STRING_PARAM_MAX_LEN
+  * \param maxlen max length of the string, if you set 0, it defaults to DSPLUG_STRING_PARAM_MAX_LEN
   * \param set_cbk User-Callback for setting a value
   * \param get_cbk User-Callback for getting a value
   * \return a Control Port Creation instance.
   */
 
- DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_string_realtime( (*set_cbk)(DSPlug_Plugin , int, const char*) ,  void (*get_cbk)(DSPlug_Plugin , int, char*) , int maxlen = DSPLUG_STRING_PARAM_MAX_LEN );
+ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_string_realtime( void (*set_cbk)(DSPlug_Plugin , int, const char*) ,  void (*get_cbk)(DSPlug_Plugin , int, char*) , int maxlen );
 
  /**
  * Instance a control port creation object. For the specific type of port.
@@ -249,7 +250,7 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
  * \return a Control Port Creation instance.
  */
 
-DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_data( (*set_cbk)(DSPlug_Plugin , int, void *, int ) , void (*get_cbk)(DSPlug_Plugin , int, void **, int* ) );
+DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_data( void (*set_cbk)(DSPlug_Plugin , int, void *, int ) , void (*get_cbk)(DSPlug_Plugin , int, void **, int* ) );
 
 /**
  * Setting this property to a port means that it will become valid

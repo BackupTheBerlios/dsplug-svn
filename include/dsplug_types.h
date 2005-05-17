@@ -390,7 +390,7 @@ typedef struct {
  */
 typedef struct {
 	const void * _private; /**< No access to the internals are provided */
-} DSPlug_PluginCreatio;
+} DSPlug_PluginCreation;
 
 /**
  * This plugin is used upon creation of a plugin library
