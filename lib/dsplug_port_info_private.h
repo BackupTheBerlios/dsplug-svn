@@ -52,7 +52,7 @@ typedef struct {
 
 	/* Flags */
 	DSPlug_Boolean is_realtime_safe;
-	DSPlug_Boolean is_editable;
+	DSPlug_Boolean is_hidden;
 
 	/* Multipart */
 

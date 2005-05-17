@@ -883,18 +883,18 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
  /* Misc Port Settings */
 
 
- DSPlug_Boolean DSPlug_ControlPortCaps_is_editable( DSPlug_ControlPortCaps p_control_caps ) {
+ DSPlug_Boolean DSPlug_ControlPortCaps_is_hidden( DSPlug_ControlPortCaps p_control_caps ) {
 
 
 	 DSPlug_ControlPortCapsPrivate *control_caps = (DSPlug_ControlPortCapsPrivate *)p_control_caps._private;
 
 	 if (control_caps==NULL) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_is_editable: Calling with NULL ControlPortCaps ");
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_is_hidden: Calling with NULL ControlPortCaps ");
 		 return DSPLUG_FALSE; /* return anything */
 	 }
 
-	 return control_caps->is_editable;
+	 return control_caps->is_hidden;
 
 
  }
