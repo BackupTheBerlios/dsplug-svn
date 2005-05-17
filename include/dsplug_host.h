@@ -441,14 +441,13 @@ const void* DSPlug_ControlPortCaps_get_raw_data_default( DSPlug_ControlPortCaps 
 
 /**
  *
- *	Return true if the plugin is ok with the host creating an editor
- *	control for it. Some ports may not be editable, so just meant for
- *	realtime, or if not editable and not realtime, then the port
- *	is meant for simply be saved and restored on each session.
+ *	Return true if the plugin does not want the host-user to know about
+ * 	the existence of this port. If so, then this port will only used
+ * 	when saving/restoring the status of the plugin.
  *	\return true if the port can be editable by the host
  */
 
-DSPlug_Boolean DSPlug_ControlPortCaps_is_editable( DSPlug_ControlPortCaps );
+DSPlug_Boolean DSPlug_ControlPortCaps_is_hidden( DSPlug_ControlPortCaps );
 
 /**
  *
@@ -603,7 +602,7 @@ char * DSPlug_PluginInstance_get_control_string_port( DSPlug_PluginInstance * , 
  *	You must use this function instead of the above one when the ports are realtime.
  *
  *	\param i control port index
- *	\param s pointer to a char buffer of size: DSPLUG_STRING_PORT_GET_MAX_LEN
+ *	\param s pointer to a char buffer of size specified in: DSPlug_PluginInstance_get_control_string_port_realtime_max_length
  */
 
  void DSPlug_PluginInstance_get_control_string_port_realtime( DSPlug_PluginInstance * , int i , char * s );
@@ -648,7 +647,6 @@ void DSPlug_PluginInstance_get_control_port_data( DSPlug_PluginInstance * , int 
  *	\param u userdata, this pointer will be returned as parameter in the callback
  */
 void DSPlug_PluginInstance_set_UI_changed_control_port_callback( DSPlug_PluginInstance * , int i , void (*c)(int, void *) , void * u);
-
 
 
 /****************************/
