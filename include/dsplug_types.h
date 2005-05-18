@@ -11,6 +11,16 @@
 
 /**< dsplug string max buffer size, including zero */
 #define DSPLUG_STRING_PARAM_MAX_LEN 512
+#define DSPLUG_NO_CONSTANT -1
+#define DSPLUG_MAX_CHANNELS_PER_AUDIO_PORT 64
+
+#define DSPLUG_MAX_AUDIO_PORTS 512
+#define DSPLUG_MAX_EVENT_PORTS 512
+#define DSPLUG_MAX_CONTROL_PORTS 16384
+
+/* This constant avoids making more steps than a floating number can handle */
+#define DSPLUG_NUMERICAL_PORT_MAX_STEPS ((1<<24)-1)
+
 
 /* //////////////////////////////////////////////////////// */
 
@@ -255,7 +265,7 @@ typedef enum {
 
 	DSPLUG_CONTROL_PORT_HINT_TYPE_FLOAT		= 0, /**< Normal port, sets/reads values from 0.0f to 1.1f */
 	DSPLUG_CONTROL_PORT_HINT_TYPE_INTEGER	= 1, /**< Same as float port, except it has stepping. **WARNING** When saving the port value, *ALWAYS* save either both the port value and the steps, or the integer value. This way if the plugin adds more steps (as in, more possible values) you can remain compatible with it. */
-	DSPLUG_CONTROL_PORT_HINT_TYPE_BOOL		= 2, /**< Only accepts >=0.5 as true, otherwise false */
+	DSPLUG_CONTROL_PORT_HINT_TYPE_BOOL		= 2, /**< Only accepts >=0.5f as true, otherwise false */
 
 } DSPlug_ControlPortNumericalHint;
 

@@ -5,6 +5,7 @@ targets = [\
 	'lib/dsplug_host.c',
 	'lib/dsplug_plugin.c',
         'lib/dsplug_library.c',
+        'lib/dsplug_helpers.c',
         'lib/dsplug_error_report.c',
         ];
         

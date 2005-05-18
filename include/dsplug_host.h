@@ -205,8 +205,9 @@ DSPlug_Boolean DSPlug_PluginCaps_has_feature( DSPlug_PluginCaps , DSPlug_PluginF
  *	Plugin Constants:
  *
  *	Plugin limits allow you to check the integer "constant values" on what the plugins
- *	supports.
+ *	supports,
  *	\param c constant from enum
+ * 	\return zero or greater positive constant, DSPLUG_NO_CONSTANT if constant is not defined by the plugin.
  */
 int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps , DSPlug_PluginConstant c);
 

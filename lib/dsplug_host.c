@@ -13,7 +13,7 @@
 #include "dsplug_host.h"
 #include "dsplug_error_report.h"
 #include "dsplug_library.h"
-
+#include "dsplug_helpers.h"
 
 
 /****************************/
@@ -140,7 +140,7 @@ DSPlug_PluginInstance * DSPlug_PluginLibrary_get_plugin_instance( DSPlug_PluginL
 	}
 
 	/* Check wether the plugin really has UI */
-	if (ui && ! ( library->plugin_caps_array[i]->features & (1<<DSPLUG_PLUGIN_FEATURE_HAS_GUI) ) ) {
+	if (ui && !DSPlug_check_features_bit(library->plugin_caps_array[i],DSPLUG_PLUGIN_FEATURE_HAS_GUI)  ) {
 
 		DSPlug_report_error("HOST: DSPlug_PluginLibrary_get_plugin_instance - Attempt to instance UI of UI-Less Plugin");
 		return NULL;
@@ -402,7 +402,7 @@ DSPlug_Boolean DSPlug_PluginCaps_has_feature( DSPlug_PluginCaps p_caps , DSPlug_
 		return DSPLUG_FALSE; /* just return something */
 	}
 
-	return (caps->features & (1<<f))?DSPLUG_TRUE:DSPLUG_FALSE;
+	return DSPlug_check_features_bit(caps,f);
 
 }
 
@@ -1145,29 +1145,37 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
 	 if (plugin_public==NULL || plugin==NULL) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_norealtime: Calling with NULL PluginInstance ");
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Calling with NULL PluginInstance ");
 		 return NULL; /* return anything */
 	 }
 
 	 if (i<0 || i>=plugin->control_port_count) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_norealtime: Invalid Control Port Index ");
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Invalid Control Port Index ");
 		 return NULL; /* return anything */
 	 }
 
 	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_STRING) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_norealtime: Port is not of string type ");
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Port is not of string type ");
 		 return NULL; /* return anything */
 
 	 }
 
+	 if (plugin->plugin_caps->control_port_caps[i]->is_realtime_safe) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Port is of type realtime safe, not allowing call. ");
+		 return ; /* return anything */
+
+	 }
+	 
+
 	 if (plugin->plugin_caps->control_port_caps[i]->get_callback_string) {
 
-		 return plugin->plugin_caps->control_port_caps[i]->get_callback_string_norealtime(*plugin_public,i);
+		 return plugin->plugin_caps->control_port_caps[i]->get_callback_string(*plugin_public,i);
 	 } else {
 
-		 DSPlug_report_error("API: DSPlug_ControlPortCaps_get_control_string_port_norealtime: Control Port not configured, Bug? ");
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_get_control_string_port: Control Port not configured, Bug? ");
 		 return NULL;
 	 }
 
@@ -1182,29 +1190,36 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 
 	 if (plugin_public==NULL || plugin==NULL) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Calling with NULL PluginInstance ");
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_realtime: Calling with NULL PluginInstance ");
 		 return ; /* return anything */
 	 }
 
 	 if (i<0 || i>=plugin->control_port_count) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Invalid Control Port Index ");
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_realtime: Invalid Control Port Index ");
 		 return ; /* return anything */
 	 }
 
 	 if (plugin->plugin_caps->control_port_caps[i]->type!=DSPLUG_CONTROL_PORT_TYPE_STRING) {
 
-		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Port is not of string type ");
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_realtime: Port is not of string type ");
 		 return ; /* return anything */
 
 	 }
 
+	 if (!plugin->plugin_caps->control_port_caps[i]->is_realtime_safe) {
+
+		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port_realtime: Port is not realtime safe, not allowing call. ");
+		 return ; /* return anything */
+
+	 }
+	 
 	 if (plugin->plugin_caps->control_port_caps[i]->get_callback_string) {
 
-		 plugin->plugin_caps->control_port_caps[i]->get_callback_string(*plugin_public,i,s);
+		 plugin->plugin_caps->control_port_caps[i]->get_callback_string_realtime(*plugin_public,i,s);
 	 } else {
 
-		 DSPlug_report_error("API: DSPlug_ControlPortCaps_get_control_string_port: Control Port not configured, Bug? ");
+		 DSPlug_report_error("API: DSPlug_ControlPortCaps_get_control_string_port_realtime: Control Port not configured, Bug? ");
 	 }
 
 

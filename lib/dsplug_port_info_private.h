@@ -69,7 +69,7 @@ typedef struct {
 
 	/* Defaults */
 
-	int realtime_port_max_len;
+	int realtime_port_string_max_len;
 
 	/* Callback to Plugin when setting and getting ports */
 
@@ -78,8 +78,8 @@ typedef struct {
 	void (*set_callback_data)(DSPlug_Plugin , int, const void *, int); /**< Callback to data value set */
 
 	float (*get_callback_numerical)(DSPlug_Plugin , int); /**< Callback to float value get */
-	char * (*get_callback_string_norealtime)(DSPlug_Plugin , int); /**< Callback to string value get, not realtime */
-	void (*get_callback_string)(DSPlug_Plugin , int, char *); /**< Callback to string value get */
+	char * (*get_callback_string)(DSPlug_Plugin , int); /**< Callback to string value get, not realtime */
+	void (*get_callback_string_realtime)(DSPlug_Plugin , int, char *); /**< Callback to string value get */
 	void (*get_callback_data)(DSPlug_Plugin , int, void **, int*); /**< Callback to data value get */
 
 } DSPlug_ControlPortCapsPrivate;

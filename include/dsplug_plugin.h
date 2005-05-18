@@ -73,16 +73,17 @@ void DSPlug_PluginCreation_set_copyright( DSPlug_PluginCreation * , const char *
  * \param s pointer to a C-string of max length (including ending 0 char ) DSPLUG_STRING_MAX_LEN. If larger than this, it will be clipped.
  *
  */
-void DSPlug_PluginCreation_set_version( DSPlug_PluginCreation * , const char *s );
+void DSPlug_PluginCreation_set_version( DSPlug_PluginCreation * , const char *s );  /**< *REQUIRED* */
 
 /**
  * Set the version up to where this plugin is compatible, it must be minor
  * or equal than the current version.
  * This is done to avoid incompatibilities if a new version of the plugin adds more ports, channels, etc.
+ * NOTE: The plugin to fail creation if the compatible version is greater than the version.
  * \param s pointer to a C-string of max length (including ending 0 char ) DSPLUG_STRING_MAX_LEN. If larger than this, it will be clipped.
  *
  */
-void DSPlug_PluginCreation_set_compatible_version( DSPlug_PluginCreation * , const char *s );
+void DSPlug_PluginCreation_set_compatible_version( DSPlug_PluginCreation * , const char *s ); /**< *REQUIRED* */
 /**
  * Set the Unique ID string for this plugin. Write wathever you want for development
  * that doesnt conflict with an existing naming scheme. Official unique IDs can be
@@ -286,6 +287,14 @@ void DSPlug_ControlPortCreation_set_realtime(DSPlug_ControlPortCreation *);
  *
  */
 void DSPlug_ControlPortCreation_set_hidden(DSPlug_ControlPortCreation *);
+
+/**
+ * Setting this property will give the port a musical part.
+ * For multitimbral synthesizer plugins, you can set the por musical part
+ * corresponding to the musical channel here, begining from 0
+ *
+ */
+void DSPlug_ControlPortCreation_set_musical_part(DSPlug_ControlPortCreation *, int p_part);
 
 /**
  * Set the pointer to the process function. This function is called

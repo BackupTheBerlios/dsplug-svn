@@ -12,10 +12,14 @@
 
 
 #define MAX_PLUGIN_CAPS_CONSTANTS 32
+#define MAX_PLUGIN_CAPS_FEATURE_BYTES 16
 
 typedef struct {
 
-
+	/* If no errors on the creation happened, this is true */
+	
+	DSPlug_Boolean created_succesfully;
+	
 	/* Strings */
 
 
@@ -49,7 +53,7 @@ typedef struct {
 
 	/* Bitmask for Features */
 
-	unsigned long int features;
+	unsigned char features[MAX_PLUGIN_CAPS_FEATURE_BYTES];
 
 	/* Table for Constants */
 
@@ -68,7 +72,6 @@ typedef struct {
 	/* Misc Callbacks */
 
 	int  (*get_output_delay_callback)(DSPlug_Plugin *);
-
 
 } DSPlug_PluginCapsPrivate;
 
