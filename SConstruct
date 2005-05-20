@@ -7,6 +7,7 @@ targets = [\
         'lib/dsplug_library.c',
         'lib/dsplug_helpers.c',
         'lib/dsplug_error_report.c',
+        'lib/dsplug_default_loader.c',
         ];
         
 StaticLibrary('DSPlug', targets, CCFLAGS=unix_flags)

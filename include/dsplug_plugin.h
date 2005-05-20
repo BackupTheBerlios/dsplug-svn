@@ -1,3 +1,19 @@
+/***************************************************************************
+    This file is part of the DSPlug DSP Plugin Architecture
+    url                  : http://www.dsplug.org
+    copyright            : (C) 2005 by Juan Linietsky
+    email                : coding -dontspamme- *AT* -please- reduz *DOT* com *DOT* ar
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+ *   as published by the Free Software Foundation; either version 2.1 of   *
+ *   the License, or (at your option) any later version.                   *
+ *                                                                         *
+ ***************************************************************************/
+
 /**
  * \file dsplug_plugin.h
  * \author Juan Linietsky
@@ -7,6 +23,7 @@
 #define DSPlUG_PLUGIN_H
 
 #include "dsplug_types.h"
+#include "dsplug_plugin_caps.h"
 
 /**************************
 * Plugin Library Creation *
@@ -251,7 +268,7 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
  * \return a Control Port Creation instance.
  */
 
-DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_data( void (*set_cbk)(DSPlug_Plugin , int, void *, int ) , void (*get_cbk)(DSPlug_Plugin , int, void **, int* ) );
+DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_data( void (*set_cbk)(DSPlug_Plugin , int, const void *, int ) , void (*get_cbk)(DSPlug_Plugin , int, void **, int* ) );
 
 /**
  * Setting this property to a port means that it will become valid
@@ -347,7 +364,7 @@ void DSPlug_PluginCreation_set_reset_callback( DSPlug_PluginCreation * , void (*
  * the input and output the plugin introduces a delay (due to some algorithm, FFT, etc)
  * you can let the host know about it by using this. It is not mandatory to implement.
  */
-void DSPlug_PluginCreation_set_output_delay_callback( int (*get_output_delay_callback)(DSPlug_Plugin *) );
+void DSPlug_PluginCreation_set_output_delay_callback( DSPlug_PluginCreation * ,int (*get_output_delay_callback)(DSPlug_Plugin *) );
 
 /*********
 * Plugin *

@@ -1,3 +1,18 @@
+/***************************************************************************
+    This file is part of the DSPlug DSP Plugin Architecture
+    url                  : http://www.dsplug.org
+    copyright            : (C) 2005 by Juan Linietsky
+    email                : coding -dontspamme- *AT* -please- reduz *DOT* com *DOT* ar
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+ *   as published by the Free Software Foundation; either version 2.1 of   *
+ *   the License, or (at your option) any later version.                   *
+ *                                                                         *
+ ***************************************************************************/
 
 /**
  * \file dsplug_host.h
@@ -33,6 +48,10 @@ DSPlug_PluginLibrary * DSPlug_Host_open_plugin_library( const char * p ) {
 
 	DSPlug_PluginLibraryPrivate * library;
 	DSPlug_PluginLibrary * library_public;
+
+	/* TODO: move this somewhere else, possibly on _init for the DLL version? */
+
+	DSPlug_LibraryFile_handler_initialize();
 
 	char * full_path = DSPlug_LibraryCache_get_full_path(p);
 
@@ -161,7 +180,7 @@ DSPlug_PluginInstance * DSPlug_PluginLibrary_get_plugin_instance( DSPlug_PluginL
 
 		/* User Data */
 
-		void * plugin_userdata = library->plugin_caps_array[i]->instance_plugin_userdata(aux_caps,ui);
+		void * plugin_userdata = library->plugin_caps_array[i]->instance_plugin_userdata(aux_caps,r,ui);
 		if (plugin_userdata==NULL) {
 
 			free(plugin_instance);
@@ -173,11 +192,12 @@ DSPlug_PluginInstance * DSPlug_PluginLibrary_get_plugin_instance( DSPlug_PluginL
 		plugin = (DSPlug_Plugin *)malloc(sizeof(DSPlug_Plugin));
 		plugin->_user_private = plugin_userdata;
 
+
 		/* Plugin Data */
 
 		plugin_private = (DSPlug_PluginPrivate *)malloc(sizeof(DSPlug_PluginPrivate));
 		plugin_private->plugin_caps=caps_private;
-
+		plugin_private->sampling_rate=r;
 		/* Create the port structures */
 
 		/* * Audio Ports * */
@@ -1165,10 +1185,10 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 	 if (plugin->plugin_caps->control_port_caps[i]->is_realtime_safe) {
 
 		 DSPlug_report_error("HOST: DSPlug_ControlPortCaps_get_control_string_port: Port is of type realtime safe, not allowing call. ");
-		 return ; /* return anything */
+		 return NULL; /* return anything */
 
 	 }
-	 
+
 
 	 if (plugin->plugin_caps->control_port_caps[i]->get_callback_string) {
 
@@ -1213,7 +1233,7 @@ int DSPlug_PluginCaps_get_constant( DSPlug_PluginCaps p_caps , DSPlug_PluginCons
 		 return ; /* return anything */
 
 	 }
-	 
+
 	 if (plugin->plugin_caps->control_port_caps[i]->get_callback_string) {
 
 		 plugin->plugin_caps->control_port_caps[i]->get_callback_string_realtime(*plugin_public,i,s);

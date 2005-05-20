@@ -1,3 +1,19 @@
+/***************************************************************************
+    This file is part of the DSPlug DSP Plugin Architecture
+    url                  : http://www.dsplug.org
+    copyright            : (C) 2005 by Juan Linietsky
+    email                : coding -dontspamme- *AT* -please- reduz *DOT* com *DOT* ar
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+ *   as published by the Free Software Foundation; either version 2.1 of   *
+ *   the License, or (at your option) any later version.                   *
+ *                                                                         *
+ ***************************************************************************/
+
 /**
  * \file dsplug_types.h
  * \author Juan Linietsky
@@ -39,6 +55,11 @@ typedef int DSPlug_Boolean;
 
 /* Plugin Types */
 
+/**
+ * Plugin usage hints enumeration, this will be removed from final vesion
+ * and implemented in a different way.
+ *
+ */
 
 typedef enum {
 
@@ -48,7 +69,7 @@ typedef enum {
 	* used from custom applications or modular hosts.
 	*/
 	DSPLUG_USAGE_HINT_GENERIC			= 1 ,
-	
+
 	/**
 	* To comply with this, the plugin will have ONE input
 	* AUDIO port (of any given number of channels).
@@ -56,7 +77,7 @@ typedef enum {
 	* to analyze the audio at some point, and provide
 	* feedback through the control ports or the UI.
 	*/
-	
+
 	DSPLUG_USAGE_HINT_AUDIO_ANALYZER		= 2 ,
 
 	/**
@@ -66,7 +87,7 @@ typedef enum {
 	* process, then return the modified signal.
 	*/
 	DSPLUG_USAGE_HINT_SIMPLE_AUDIO_PROCESSOR	= 3 ,
-	
+
 	/**
 	* Modulator Plugins will provide a bidirectional
 	* AUDIO port, plus any number of extra AUDIO inputs.
@@ -87,7 +108,7 @@ typedef enum {
 	*/
 
 	DSPLUG_USAGE_HINT_AUDIO_SPLITTER		= 5 ,
-	
+
 	/**
 	* To comply with this, the plugin will only have output ports.
 	* This is common for white noise sources, oscillators, or
@@ -105,22 +126,22 @@ typedef enum {
 	* an audio capture api).
 	*/
 	DSPLUG_USAGE_HINT_AUDIO_CHANNEL_REMAPPER	= 7 ,
-	
+
 	/**
 	* This is for plugins that takes ONE input port of N channels
 	* and ONE output port of M channels.
 	* (for example stero->mono, mono with panpot to stereo, 5.1 encoder, etc)
       	*/
 	DSPLUG_USAGE_HINT_MUSIC_EVENT_EXTRACTOR		= 8 ,
-										
-	/** 
+
+	/**
 	* This kind of plugins will have ONE bidirectional music event
 	* port. in OMNI mode,
 	* without audio ports. Most common uses would be event filters,
 	* arpeggiator, etc
 	*/
 	DSPLUG_USAGE_HINT_MUSIC_EVENT_FILTER		= 9 ,
-	
+
 	/**
 	* Plugins of this kind can have multiple event inputs
 	* and outputs, and they are meant for routing matrices,
@@ -128,7 +149,7 @@ typedef enum {
 	* supported for this type.
 	*/
 	DSPLUG_USAGE_HINT_MUSIC_EVENT_MATRIX		= 10,
-	
+
 	/**
 	* Just like an audio analyzer, but with events.
 	* This is useful for analysis tools, but could be
@@ -164,7 +185,7 @@ typedef enum {
 	* with the midi events.
 	*/
 	DSPLUG_USAGE_HINT_SYNTHESIZER			= 14,
-										
+
 	/**
 	* The same as above, but with any number of input
 	* music event ports and any number of audio outputs.
@@ -176,7 +197,7 @@ typedef enum {
 	* given port is: number of midi port * 16 + midi channel.
 	*/
 	DSPLUG_USAGE_HINT_MULTIPART_SYNTHESIZER 	= 15,
- 
+
 } DSPlug_PluginUsageHint;
 
 /* //////////////////////////////////////////////////////// */
@@ -228,14 +249,14 @@ typedef enum {
 	* implemented.
 	*/
 	DSPLUG_EVENT_TYPE_MIDI		= 2,
-	
+
 	/**
 	 * AUDIO Ports are for plugins to receive information such
 	 * as output/input latency, transport in frames, and other audio information.
 	 */
 	DSPLUG_EVENT_TYPE_AUDIO		= 3,
-	
-	
+
+
 } DSPlug_EventType;
 
 
@@ -246,7 +267,7 @@ typedef enum {
 
 
 /* Control Port Types */
-	
+
 typedef enum {
 
 
@@ -275,7 +296,7 @@ typedef enum {
 
 typedef enum {
 
-	
+
 	/**
 	* if the plugin algorithm is of type:
 	* DSPLUG_USAGE_HINT_SIMPLE_AUDIO_PROCESSOR
@@ -283,22 +304,22 @@ typedef enum {
 	* that c*out=c*in then it can define this
 	* feature.
 	*/
-	
+
 	DSPLUG_PLUGIN_FEATURE_LINEARITY_PROCESSING 	= 0 ,
 
 	/**
 	* Plugin has built-in graphical user interface editor
-	*/	
+	*/
 	DSPLUG_PLUGIN_FEATURE_HAS_GUI			= 1 ,
-	
+
 	/**
 	* Plugin features locking. It is not of much use
 	* to the host except for, maybe optimization purposes.
 	* Locking is handled internally by the plugin.
 	* For more info see plugin-api.
-	*/	
+	*/
 	DSPLUG_PLUGIN_FEATURE_LOCKING			= 2 ,
-	
+
 	/**
 	 * If the plugin needs to be run in realtime, because
 	 * of any reason (most probably interacting with something
@@ -319,11 +340,11 @@ typedef enum {
 typedef enum {
 	DSPLUG_PLUGIN_CONSTANT_MAX_SAMPLING_RATE	= 1, /**< Maximum sample rate that the plugin can work at, default is 0 (any) */
 	DSPLUG_PLUGIN_CONSTANT_MIN_SAMPLING_RATE	= 2, /**< Minimum sample rate that the plugin can work at default is 1 */
-	
+
 	DSPLUG_PLUGIN_CONSTANT_DEFAULT_CHANNELS		= 3, /**<  Default amount of channels the plugin works with, when  features DSPLUG_PLUGIN_FEATURE_VARIABLE_AUDIO_CHANNELS */
 
 } DSPlug_PluginConstant;
-	
+
 
 /* //////////////////////////////////////////////////////// */
 /* //////////////////////////////////////////////////////// */
@@ -415,5 +436,5 @@ typedef struct {
 typedef struct {
 	const void * _private; /**< No access to the internals are provided */
 } DSPlug_ControlPortCreation;
-		
+
 #endif /* dsplug_types.h */

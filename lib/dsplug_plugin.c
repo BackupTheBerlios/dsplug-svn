@@ -1,3 +1,18 @@
+/***************************************************************************
+    This file is part of the DSPlug DSP Plugin Architecture
+    url                  : http://www.dsplug.org
+    copyright            : (C) 2005 by Juan Linietsky
+    email                : coding -dontspamme- *AT* -please- reduz *DOT* com *DOT* ar
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+ *   as published by the Free Software Foundation; either version 2.1 of   *
+ *   the License, or (at your option) any later version.                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "dsplug_plugin.h"
 #include "dsplug_private.h"
@@ -22,14 +37,14 @@ DSPlug_PluginCreation* DSPlug_LibraryCreation_instance_plugin_creation( DSPlug_L
 	DSPlug_copy_to_newstring(&plugin_caps->info_copyright,"Uncopyrighted Plugin");
 	DSPlug_copy_to_newstring(&plugin_caps->info_version,"00.00.00");
 	DSPlug_copy_to_newstring(&plugin_caps->info_compatible_version,"");
-	
+
 	DSPlug_copy_to_newstring(&plugin_caps->info_description,"");
 	DSPlug_copy_to_newstring(&plugin_caps->info_HTTP_URL,"http://www.dsplug.org");
 	DSPlug_copy_to_newstring(&plugin_caps->info_category_path,"/Uncategorized");
-				
+
 	for (i=0;i<MAX_PLUGIN_CAPS_CONSTANTS;i++)
 		plugin_caps->constants[i]=DSPLUG_NO_CONSTANT;
-	
+
 
 	plugin_creation->_private=plugin_caps;
 
@@ -51,17 +66,32 @@ void DSPlug_LibraryCreation_abort_plugin_creation( DSPlug_LibraryCreation p_lib_
 		DSPlug_report_error("PLUGIN: DSPlug_LibraryCreation_abort_plugin_creation: attempt to abort a succesfully created plugin");
 		return;
 	}
-	
+
 	DSPlug_free_plugin_caps(plugin_caps);
 	free(pc);
 }
 
 DSPlug_Boolean DSPlug_LibraryCreation_add_plugin( DSPlug_LibraryCreation p_lib_creation, DSPlug_PluginCreation * pc ) {
 
+	DSPlug_PluginLibraryPrivate *library = (DSPlug_PluginLibraryPrivate *)p_lib_creation._private;
+	DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)pc->_private;
 
+	if (!library) {
 
+		DSPlug_report_error("PLUGIN: DSPlug_LibraryCreation_add_plugin: invalid library");
+		return DSPLUG_FALSE;
+	}
 
-	return DSPLUG_FALSE;
+	if (!pc || !plugin_caps) {
+
+		DSPlug_report_error("PLUGIN: DSPlug_LibraryCreation_add_plugin: Invalid PluginCreation object (NULL)");
+		return DSPLUG_FALSE;
+	}
+
+	library->plugin_caps_array=realloc( library->plugin_caps_array, library->plugin_count*sizeof(DSPlug_PluginCapsPrivate) );
+	library->plugin_caps_array[library->plugin_count-1]=plugin_caps;
+
+	return DSPLUG_TRUE;
 }
 
 
@@ -119,7 +149,7 @@ void DSPlug_PluginCreation_set_version( DSPlug_PluginCreation *p_plugin_creation
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_set_version: Invalid PluginCreation object (NULL)");
 		return;
 	}
-	
+
 	DSPlug_copy_to_newstring(&plugin_caps->info_version,s);
 
 }
@@ -133,7 +163,7 @@ void DSPlug_PluginCreation_set_compatible_version( DSPlug_PluginCreation *p_plug
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_set_compatible_version: Invalid PluginCreation object (NULL)");
 		return;
 	}
-	
+
 	DSPlug_copy_to_newstring(&plugin_caps->info_version,s);
 
 }
@@ -147,7 +177,7 @@ void DSPlug_PluginCreation_set_unique_ID( DSPlug_PluginCreation *p_plugin_creati
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_set_unique_ID: Invalid PluginCreation object (NULL)");
 		return;
 	}
-	
+
 	DSPlug_copy_to_newstring(&plugin_caps->info_unique_ID,s);
 
 }
@@ -161,7 +191,7 @@ void DSPlug_PluginCreation_set_description( DSPlug_PluginCreation *p_plugin_crea
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_set_description: Invalid PluginCreation object (NULL)");
 		return;
 	}
-	
+
 	DSPlug_copy_to_newstring(&plugin_caps->info_description,s);
 
 
@@ -193,14 +223,14 @@ void DSPlug_PluginCreation_set_category_path( DSPlug_PluginCreation *p_plugin_cr
 
 	DSPlug_copy_to_newstring(&plugin_caps->info_category_path,s);
 
-	
+
 }
 
 
 void DSPlug_PluginCreation_set_usage_hint( DSPlug_PluginCreation *p_plugin_creation , DSPlug_PluginUsageHint h ) {
 
 
-	
+
 }
 
 
@@ -209,7 +239,7 @@ void DSPlug_PluginCreation_add_feature( DSPlug_PluginCreation *p_plugin_creation
 	DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
 	int fbyte=(int)f/8;
 	int fbit=(int)f%8;
-	
+
 	if (!p_plugin_creation || !plugin_caps) {
 
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_add_feature Invalid PluginCreation object (NULL)");
@@ -232,7 +262,7 @@ void DSPlug_PluginCreation_add_feature( DSPlug_PluginCreation *p_plugin_creation
 void DSPug_PluginCreation_add_constant( DSPlug_PluginCreation *p_plugin_creation , DSPlug_PluginConstant c ,int cv ) {
 
 	DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
-	
+
 	if (!p_plugin_creation || !plugin_caps) {
 
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_add_feature Invalid PluginCreation object (NULL)");
@@ -251,16 +281,16 @@ void DSPug_PluginCreation_add_constant( DSPlug_PluginCreation *p_plugin_creation
 		DSPlug_report_error("API: DSPlug_PluginCreation_add_constant: Negative constants not allowed");
 		return;
 	}
-	
-		
+
+
 	plugin_caps->constants[c]=cv;
 
 }
 
 void DSPlug_PluginCreation_add_audio_port( DSPlug_PluginCreation *p_plugin_creation , DSPlug_PlugType plug, const char *label, const char *name , const char *path, int ch ) {
 
-	DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation_private->_private;
-	
+	DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
+
 	if (!p_plugin_creation || !plugin_caps) {
 
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_add_audio_port: Invalid PluginCreation object (NULL)");
@@ -281,12 +311,12 @@ void DSPlug_PluginCreation_add_audio_port( DSPlug_PluginCreation *p_plugin_creat
 
 	plugin_caps->audio_port_count++;
 	plugin_caps->audio_port_caps=(DSPlug_AudioPortCapsPrivate**)realloc(plugin_caps->audio_port_caps,sizeof(DSPlug_AudioPortCapsPrivate*)*plugin_caps->audio_port_count);
-	
+
 	plugin_caps->audio_port_caps[plugin_caps->audio_port_count-1]=(DSPlug_AudioPortCapsPrivate*)malloc(sizeof(DSPlug_AudioPortCapsPrivate));
 	DSPlug_CommonPortCapsPrivate *cpc=&plugin_caps->audio_port_caps[plugin_caps->audio_port_count-1]->common;
 	DSPlug_copy_to_newstring(&cpc->caption,label);
 	DSPlug_copy_to_newstring(&cpc->name,name);
-	DSPlug_copy_to_newstring(&cpc->path,path);
+	DSPlug_validate_path_to_newstring(&cpc->path,path);
 	cpc->plug_type=plug;
 
 	plugin_caps->audio_port_caps[plugin_caps->audio_port_count-1]->channel_count=ch;
@@ -297,7 +327,7 @@ void DSPlug_PluginCreation_add_audio_port( DSPlug_PluginCreation *p_plugin_creat
 void DSPlug_PluginCreation_add_event_port( DSPlug_PluginCreation *p_plugin_creation , DSPlug_PlugType plug, const char *label, const char *name , const char *path, DSPlug_EventType evt ) {
 
 	DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
-	
+
 	if (!p_plugin_creation || !plugin_caps) {
 
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_add_event_port: Invalid PluginCreation object (NULL)");
@@ -312,12 +342,12 @@ void DSPlug_PluginCreation_add_event_port( DSPlug_PluginCreation *p_plugin_creat
 
 	plugin_caps->event_port_count++;
 	plugin_caps->event_port_caps=(DSPlug_EventPortCapsPrivate**)realloc(plugin_caps->event_port_caps,sizeof(DSPlug_EventPortCapsPrivate*)*plugin_caps->event_port_count);
-	
+
 	plugin_caps->event_port_caps[plugin_caps->event_port_count-1]=(DSPlug_EventPortCapsPrivate*)malloc(sizeof(DSPlug_EventPortCapsPrivate));
 	DSPlug_CommonPortCapsPrivate *cpc=&plugin_caps->event_port_caps[plugin_caps->event_port_count-1]->common;
 	DSPlug_copy_to_newstring(&cpc->caption,label);
 	DSPlug_copy_to_newstring(&cpc->name,name);
-	DSPlug_copy_to_newstring(&cpc->path,path);
+	DSPlug_validate_path_to_newstring(&cpc->path,path);
 	cpc->plug_type=plug;
 
 	plugin_caps->event_port_caps[plugin_caps->event_port_count-1]->event_type=evt;
@@ -328,8 +358,8 @@ void DSPlug_PluginCreation_add_control_port( DSPlug_PluginCreation *p_plugin_cre
 
 	DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
 	DSPlug_ControlPortCapsPrivate *control_port_caps = (DSPlug_ControlPortCapsPrivate *)ctpc->_private;
-	
-	
+
+
 	if (!p_plugin_creation || !plugin_caps) {
 
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_add_control_port: Invalid PluginCreation object (NULL)");
@@ -341,7 +371,7 @@ void DSPlug_PluginCreation_add_control_port( DSPlug_PluginCreation *p_plugin_cre
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_add_control_port: Invalid ControlPortCaps object (NULL)");
 		return;
 	}
-		
+
 	if (plugin_caps->control_port_count>=DSPLUG_MAX_CONTROL_PORTS) {
 
 		DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_add_control_port: Maximum number of control ports reached");
@@ -351,16 +381,16 @@ void DSPlug_PluginCreation_add_control_port( DSPlug_PluginCreation *p_plugin_cre
 
 	plugin_caps->control_port_count++;
 	plugin_caps->control_port_caps=(DSPlug_ControlPortCapsPrivate**)realloc(plugin_caps->control_port_caps,sizeof(DSPlug_ControlPortCapsPrivate*)*plugin_caps->control_port_count);
-	
+
 	plugin_caps->control_port_caps[plugin_caps->control_port_count-1]=control_port_caps;
-	
+
 	DSPlug_CommonPortCapsPrivate *cpc=&plugin_caps->control_port_caps[plugin_caps->control_port_count-1]->common;
 	DSPlug_copy_to_newstring(&cpc->caption,label);
 	DSPlug_copy_to_newstring(&cpc->name,name);
-	DSPlug_copy_to_newstring(&cpc->path,path);
+	DSPlug_validate_path_to_newstring(&cpc->path,path);
 	cpc->plug_type=plug;
 
-	
+
 	free(ctpc);
 
 
@@ -397,11 +427,11 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_float( 
 
 	control_port_caps->set_callback_numerical=set_cbk;
 	control_port_caps->get_callback_numerical=get_cbk;
-	
+
 	control_port_caps->float_display_function=disp_func;
 
 	return control_port_creation;
-	
+
 }
 
 DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_integer( int steps, DSPlug_Boolean is_enum, void (*set_cbk)(DSPlug_Plugin , int, float) ,  float (*get_cbk)(DSPlug_Plugin , int) , void (*disp_func)(float, char *)) {
@@ -430,7 +460,7 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_integer
 
 	control_port_caps->set_callback_numerical=set_cbk;
 	control_port_caps->get_callback_numerical=get_cbk;
-	
+
 	control_port_caps->float_display_function=disp_func;
 
 	return control_port_creation;
@@ -455,7 +485,7 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
 
 	control_port_caps->set_callback_numerical=set_cbk;
 	control_port_caps->get_callback_numerical=get_cbk;
-	
+
 	control_port_caps->float_display_function=disp_func;
 
 	return control_port_creation;
@@ -512,7 +542,7 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
  }
 
 
- DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_data( void (*set_cbk)(DSPlug_Plugin , int, void *, int ) , void (*get_cbk)(DSPlug_Plugin , int, void **, int* ) ) {
+ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_data( void (*set_cbk)(DSPlug_Plugin , int, const void *, int ) , void (*get_cbk)(DSPlug_Plugin , int, void **, int* ) ) {
 
 
 	 DSPlug_ControlPortCreation *control_port_creation;
@@ -538,12 +568,12 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
 
  }
 
- 
+
  void DSPlug_ControlPortCreation_set_realtime(DSPlug_ControlPortCreation *p_port) {
 
 	 DSPlug_ControlPortCapsPrivate *control_port_caps = (DSPlug_ControlPortCapsPrivate *)p_port->_private;
 
-	
+
 	 if (!p_port || !control_port_caps) {
 
 		 DSPlug_report_error("PLUGIN: DSPlug_ControlPortCreation_set_realtime: Invalid ControlPortCreation object (NULL)");
@@ -566,7 +596,7 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
 
 	 DSPlug_ControlPortCapsPrivate *control_port_caps = (DSPlug_ControlPortCapsPrivate *)p_port->_private;
 
-	
+
 	 if (!p_port || !control_port_caps) {
 
 		 DSPlug_report_error("PLUGIN: DSPlug_ControlPortCreation_set_hidden: Invalid ControlPortCreation object (NULL)");
@@ -581,7 +611,7 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
 
 	 DSPlug_ControlPortCapsPrivate *control_port_caps = (DSPlug_ControlPortCapsPrivate *)p_port->_private;
 
-	
+
 	 if (!p_port || !control_port_caps) {
 
 		 DSPlug_report_error("PLUGIN: DSPlug_ControlPortCreation_set_musical_part: Invalid ControlPortCreation object (NULL)");
@@ -593,43 +623,82 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
 		 DSPlug_report_error("PLUGIN: DSPlug_ControlPortCreation_set_musical_part: Invalid Musical Part");
 		 return;
 	 }
-	 
-	 control_port_caps->musical_part=p_part+1; //plus one, so I know zero is unused
+
+	 control_port_caps->musical_part=p_part+1; /* plus one, so I know zero is unused */
 
  }
 
- 
+
 
  void DSPlug_PluginCreation_set_process_callback( DSPlug_PluginCreation *p_plugin_creation , void (*c)(DSPlug_Plugin *, int f) ) {
 
 
+	 DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
 
+	 if (!p_plugin_creation || !plugin_caps) {
 
+		 DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_set_process_callback: Invalid PluginCreation object (NULL)");
+		 return;
+	 }
+
+	 plugin_caps->process_callback=c;
 
  }
 
- void DSPlug_PluginCreation_set_instance_process_userdata_callback( DSPlug_PluginCreation *p_plugin_creation , void* (*cbk)(DSPlug_PluginCaps, float samplerate, DSPlug_Boolean ui) ) {
+ void DSPlug_PluginCreation_set_instance_process_userdata_callback( DSPlug_PluginCreation *p_plugin_creation , void* (*c)(DSPlug_PluginCaps, float samplerate, DSPlug_Boolean ui)) {
 
+	 DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
 
+	 if (!p_plugin_creation || !plugin_caps) {
 
+		 DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_set_instance_process_data_callback: Invalid PluginCreation object (NULL)");
+		 return;
+	 }
 
- }
+	 plugin_caps->instance_plugin_userdata=c;
+
+}
 
  void DSPlug_PluginCreation_set_destroy_process_userdata_callback( DSPlug_PluginCreation *p_plugin_creation , void (*c)(DSPlug_Plugin *) ) {
 
+	 DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
+
+	 if (!p_plugin_creation || !plugin_caps) {
+
+		 DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_set_destroy_process_data_callback: Invalid PluginCreation object (NULL)");
+		 return;
+	 }
+
+	 plugin_caps->destroy_plugin_userdata=c;
 
 
  }
 
  void DSPlug_PluginCreation_set_reset_callback( DSPlug_PluginCreation *p_plugin_creation , void (*c)(DSPlug_Plugin *) ) {
 
+	 DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
 
+	 if (!p_plugin_creation || !plugin_caps) {
 
+		 DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_set_reset_callback: Invalid PluginCreation object (NULL)");
+		 return;
+	 }
+
+	 plugin_caps->reset_callback=c;
 
  }
 
- void DSPlug_PluginCreation_set_output_delay_callback( int (*get_output_delay_callback)(DSPlug_Plugin *) ) {
+ void DSPlug_PluginCreation_set_output_delay_callback( DSPlug_PluginCreation *p_plugin_creation ,int (*c)(DSPlug_Plugin *) ) {
 
+	 DSPlug_PluginCapsPrivate *plugin_caps = (DSPlug_PluginCapsPrivate *)p_plugin_creation->_private;
+
+	 if (!p_plugin_creation || !plugin_caps) {
+
+		 DSPlug_report_error("PLUGIN: DSPlug_PluginCreation_get_output_delay_callback: Invalid PluginCreation object (NULL)");
+		 return;
+	 }
+
+	 plugin_caps->get_output_delay_callback=c;
 
 
  }
@@ -640,35 +709,93 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
 
  float DSPlug_Plugin_get_sample_rate( DSPlug_Plugin p_plugin ) {
 
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate*)p_plugin._private;
+	 if (!plugin) {
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_sample_rate: Invalid Plugin object (NULL)");
+		 return 0;
+	 }
 
+
+	 return plugin->sampling_rate;
 
  }
 
  void * DSPlug_Plugin_get_userdata( DSPlug_Plugin p_plugin ) {
 
-
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate*)p_plugin._private;
+	 if (!plugin) {
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_userdata: Invalid Plugin object (NULL)");
+		 return NULL;
+	 }
+	 return (void*)p_plugin._user_private;
 
  }
- 
+
  DSPlug_PluginCaps DSPlug_Plugin_get_plugin_caps( DSPlug_Plugin p_plugin ) {
 
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate*)p_plugin._private;
+	 DSPlug_PluginCaps caps;
+	 caps._private=NULL;
 
+	 if (!plugin) {
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_plugin_caps: Invalid Plugin object (NULL)");
+		 return caps;
+	 }
+
+	 caps._private=plugin->plugin_caps;
+
+	 return caps;
  }
 
  /* Audio */
 
  float * DSPlug_Plugin_get_audio_port_channel_buffer( DSPlug_Plugin p_plugin , int p, int c) {
 
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate*)p_plugin._private;
 
+	 if (!plugin) {
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_audio_port_channel_buffer: Invalid Plugin object (NULL)");
+		 return NULL;
+	 }
 
+	 if (p<0 || p>=plugin->audio_port_count) {
+
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_audio_port_channel_buffer: Invalid Port Index");
+		 return NULL;
+	 }
+
+	 if (c<0 || c>=plugin->audio_ports[p]->channel_count) {
+
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_audio_port_channel_buffer: Invalid Channel Index");
+		 return NULL;
+	 }
+
+	 return plugin->audio_ports[p]->channel_buffer_ptr[c];
 
  }
 
  float ** DSPlug_Plugin_get_audio_port_channel_buffer_pointer( DSPlug_Plugin p_plugin , int p, int c) {
 
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate*)p_plugin._private;
 
+	 if (!plugin) {
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_audio_port_channel_buffer_pointer: Invalid Plugin object (NULL)");
+		 return NULL;
+	 }
 
+	 if (p<0 || p>=plugin->audio_port_count) {
 
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_audio_port_channel_buffer_pointer: Invalid Port Index");
+		 return NULL;
+	 }
+
+	 if (c<0 || c>=plugin->audio_ports[p]->channel_count) {
+
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_audio_port_channel_buffer_pointer: Invalid Channel Index");
+		 return NULL;
+	 }
+
+	 return &plugin->audio_ports[p]->channel_buffer_ptr[c];
 
  }
 
@@ -677,19 +804,62 @@ DSPlug_ControlPortCreation * DSPlug_ControlPortCreation_create_numerical_bool( v
  DSPlug_EventQueue* DSPlug_Plugin_get_event_port_queue( DSPlug_Plugin p_plugin , int p) {
 
 
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate*)p_plugin._private;
+
+	 if (!plugin) {
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_event_port_queue: Invalid Plugin object (NULL)");
+		 return NULL;
+	 }
+
+	 if (p<0 || p>=plugin->event_port_count) {
+
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_event_port_queue: Invalid Port Index");
+		 return NULL;
+	 }
+
+	 return plugin->event_ports[p]->queue;
 
  }
 
  DSPlug_EventQueue** DSPlug_Plugin_get_event_port_queue_pointer( DSPlug_Plugin p_plugin , int p) {
 
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate*)p_plugin._private;
+
+	 if (!plugin) {
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_event_port_queue_pointer: Invalid Plugin object (NULL)");
+		 return NULL;
+	 }
+
+	 if (p<0 || p>=plugin->event_port_count) {
+
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_get_event_port_queue_pointer: Invalid Port Index");
+		 return NULL;
+	 }
+
+	 return &plugin->event_ports[p]->queue;
 
 
  }
 
  /* Control */
 
- void DSPlug_Plugin_UI_value_changed_notify( DSPlug_Plugin p_plugin , int p) {
+ void DSPlug_Plugin_UI_conntrol_port_value_changed_notify( DSPlug_Plugin p_plugin , int p) {
 
+	 DSPlug_PluginPrivate *plugin = (DSPlug_PluginPrivate*)p_plugin._private;
+
+	 if (!plugin) {
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_UI_conntrol_port_value_changed_notify: Invalid Plugin object (NULL)");
+		 return;
+	 }
+
+	 if (p<0 || p>=plugin->control_port_count) {
+
+		 DSPlug_report_error("PLUGIN: DSPlug_Plugin_UI_conntrol_port_value_changed_notify: Invalid Port Index");
+		 return;
+	 }
+
+	 if (plugin->control_ports[p]->UI_changed_callback)
+		 plugin->control_ports[p]->UI_changed_callback(p,plugin->control_ports[p]->UI_changed_callback_userdata);
 
 
  }

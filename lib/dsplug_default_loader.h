@@ -14,13 +14,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "dsplug_error_report.h"
-
-#include <stdio.h>
-
-void DSPlug_report_error(const char *p_reason) {
-
-	fprintf(stderr,"**ERROR** %s\n",p_reason);
-}
+#ifndef DSPLUG_DEFAULT_LOADER_H
+#define DSPLUG_DEFAULT_LOADER_H
 
 
+void DSPlug_DefaultLoader_register();
+
+
+#endif

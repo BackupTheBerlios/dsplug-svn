@@ -1,3 +1,18 @@
+/***************************************************************************
+    This file is part of the DSPlug DSP Plugin Architecture
+    url                  : http://www.dsplug.org
+    copyright            : (C) 2005 by Juan Linietsky
+    email                : coding -dontspamme- *AT* -please- reduz *DOT* com *DOT* ar
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+ *   as published by the Free Software Foundation; either version 2.1 of   *
+ *   the License, or (at your option) any later version.                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "dsplug_library.h"
 #include "dsplug_error_report.h"
@@ -5,6 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "dsplug_default_loader.h"
 
 typedef struct {
 
@@ -112,6 +128,7 @@ void DSPlug_LibraryCache_remove_library(DSPlug_PluginLibraryPrivate *p_library) 
 
 static DSPlug_LibraryHandler *library_handler_elements=0;
 static int library_handler_element_count=0;
+static int library_handler_initialized=0;
 
 
 int DSPlug_LibraryFile_handler_count() {
@@ -154,10 +171,20 @@ void DSPlug_LibraryFile_handler_register(DSPlug_LibraryHandler p_library_handler
 
 }
 
+void DSPlug_LibraryFile_handler_initialize() {
+
+	if (library_handler_initialized)
+		return;
+
+	DSPlug_DefaultLoader_register();
+
+}
+
 void DSPlug_LibraryFile_handler_uninitialize() {
 
 	if (library_handler_elements)
 		free(library_handler_elements);
+
 	library_handler_element_count=0;
 
 }

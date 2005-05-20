@@ -1,3 +1,18 @@
+/***************************************************************************
+    This file is part of the DSPlug DSP Plugin Architecture
+    url                  : http://www.dsplug.org
+    copyright            : (C) 2005 by Juan Linietsky
+    email                : coding -dontspamme- *AT* -please- reduz *DOT* com *DOT* ar
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+ *   as published by the Free Software Foundation; either version 2.1 of   *
+ *   the License, or (at your option) any later version.                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #ifndef DSPlug_PRIVATE_H
 #define DSPlug_PRIVATE_H
@@ -17,9 +32,9 @@
 typedef struct {
 
 	/* If no errors on the creation happened, this is true */
-	
+
 	DSPlug_Boolean created_succesfully;
-	
+
 	/* Strings */
 
 
@@ -61,7 +76,7 @@ typedef struct {
 
 	/* Instance Plugin Userdata Callback */
 
-	void* (*instance_plugin_userdata)(DSPlug_PluginCaps, DSPlug_Boolean ui); /**< This is used to create the processing instance */
+	void* (*instance_plugin_userdata)(DSPlug_PluginCaps, float samplerate, DSPlug_Boolean ui); /**< This is used to create the processing instance */
 	void (*destroy_plugin_userdata)(DSPlug_Plugin *); /**< This is used to destroy the processing instance*/
 
 	/* Process Callbacks */
@@ -120,7 +135,7 @@ typedef struct {
 	char * library_cache_full_path; /* full path for the library cache */
 
 	/* library file handler private data, file handlers can use this freely */
-	void * library_file_handler_private;
+	void * library_file_handler_private; /* TODO: Change to plugin_loader_private */
 
 
 } DSPlug_PluginLibraryPrivate;
